@@ -65,6 +65,9 @@ public partial class App : Application
         };
 
         InitializeComponent();
+
+        // Note any resource (style, colour) the layout asks for but can't find.
+        DebugSettings.XamlResourceReferenceFailed += (_, e) => XamlProbe.ResourceProblems.Add(e.Message);
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -75,7 +78,9 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            CrashReport.Show("while starting", ex);
+            // For layout errors, find the exact line (WinUI doesn't say).
+            var extra = ex is Microsoft.UI.Xaml.Markup.XamlParseException ? XamlProbe.Run() : null;
+            CrashReport.Show("while starting", ex, extra);
             Exit();
         }
     }

@@ -51,5 +51,8 @@
 
   <ItemGroup>
     <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+    <!-- A copy of the panel layout inside SpaceKeeper.exe, so Views/XamlProbe.cs can
+         pinpoint the line if it ever fails to load. -->
+    <EmbeddedResource Include="Views\PanelWindow.xaml" LogicalName="PanelWindow.xaml" />
   </ItemGroup>
 </Project>

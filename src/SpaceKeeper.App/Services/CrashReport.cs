@@ -28,7 +28,7 @@ public static class CrashReport
         "SpaceKeeper", "crash.log");
 
     /// <summary>Saves the details and, the first time, tells the user.</summary>
-    public static void Show(string when, Exception? ex)
+    public static void Show(string when, Exception? ex, string? extra = null)
     {
         var details =
             $"""
@@ -36,6 +36,7 @@ public static class CrashReport
             SpaceKeeper {typeof(CrashReport).Assembly.GetName().Version}
             Windows {Environment.OSVersion.Version}, {RuntimeInformation.OSArchitecture}, process {RuntimeInformation.ProcessArchitecture}
             {ex}
+            {extra}
 
             """;
         try
