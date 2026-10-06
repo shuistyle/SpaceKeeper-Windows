@@ -57,6 +57,17 @@ jobs:
           --self-contained true
           -o publish/${{ matrix.rid }}
 
+      # Stop here (rather than publish a download that can't open its windows)
+      # if the compiled layouts file is missing.
+      - name: Check the layouts file is included
+        shell: pwsh
+        run: |
+          $dir = "publish/${{ matrix.rid }}"
+          if (-not ((Test-Path "$dir/SpaceKeeper.pri") -or (Test-Path "$dir/resources.pri"))) {
+            Get-ChildItem $dir -Filter *.pri | Format-Table Name, Length
+            throw "SpaceKeeper.pri is missing from the published app, so its windows can't load."
+          }
+
       - name: Zip
         shell: pwsh
         run: Compress-Archive -Path publish/${{ matrix.rid }}/* -DestinationPath SpaceKeeper-${{ matrix.rid }}.zip

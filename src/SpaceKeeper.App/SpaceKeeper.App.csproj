@@ -30,6 +30,10 @@
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
+    <!-- Needed even though SpaceKeeper isn't installed as a package: it makes the build
+         create SpaceKeeper.pri, the file holding the app's compiled window layouts.
+         Without it the panel can't load ("Cannot locate resource ... PanelWindow.xaml"). -->
+    <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <SelfContained>true</SelfContained>
     <!-- The virtual desktop library builds code at run time, so trimming must stay off. -->
@@ -55,4 +59,15 @@
          pinpoint the line if it ever fails to load. -->
     <EmbeddedResource Include="Views\PanelWindow.xaml" LogicalName="PanelWindow.xaml" />
   </ItemGroup>
+
+  <!-- Belt and braces: make sure the .pri file (and any loose compiled .xbf layouts)
+       built into the output folder also end up in the published download. -->
+  <Target Name="CopyLayoutResourcesToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <LayoutResource Include="$(OutDir)*.pri;$(OutDir)**\*.xbf" />
+    </ItemGroup>
+    <Copy SourceFiles="@(LayoutResource)"
+          DestinationFiles="@(LayoutResource->'$(PublishDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
 </Project>
