@@ -36,7 +36,11 @@ using SpaceKeeper.App.Services;
 using SpaceKeeper.App.ViewModels;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics;
-using Windows.System;
+// Only the two keyboard types are taken from Windows.System. Importing the
+// whole namespace would clash with Microsoft.UI.Dispatching, which has
+// classes with the same names (DispatcherQueueTimer, DispatcherQueuePriority).
+using VirtualKey = Windows.System.VirtualKey;
+using VirtualKeyModifiers = Windows.System.VirtualKeyModifiers;
 
 namespace SpaceKeeper.App.Views;
 
