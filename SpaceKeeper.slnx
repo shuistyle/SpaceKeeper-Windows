@@ -1,0 +1,10 @@
+<!-- Open this in Visual Studio 2022 (17.13 or later) to work on all three projects together. -->
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SpaceKeeper.App/SpaceKeeper.App.csproj" />
+    <Project Path="src/SpaceKeeper.Core/SpaceKeeper.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SpaceKeeper.Core.Tests/SpaceKeeper.Core.Tests.csproj" />
+  </Folder>
+</Solution>

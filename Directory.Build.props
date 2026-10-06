@@ -1,0 +1,18 @@
+<!--
+  Directory.Build.props — settings shared by EVERY project in this folder.
+  MSBuild (the .NET build system) automatically reads this file, so we don't
+  have to repeat these lines in each .csproj.
+-->
+<Project>
+  <PropertyGroup>
+    <!-- Use the newest C# language features available in the .NET SDK. -->
+    <LangVersion>latest</LangVersion>
+    <!-- Warn us whenever something might be null (helps avoid crashes). -->
+    <Nullable>enable</Nullable>
+    <!-- Lets us write `List<int>` without `using System.Collections.Generic;` etc. -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Authors>Andrew Flowerdew</Authors>
+    <Product>SpaceKeeper</Product>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+</Project>

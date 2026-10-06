@@ -1,0 +1,11 @@
+<!--
+  SpaceKeeper.Core — the "logic" library.
+  It contains NO Windows-specific code, so it can be built and unit-tested on
+  any computer (Windows, Mac or Linux). The app project (SpaceKeeper.App) uses it.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>SpaceKeeper.Core</RootNamespace>
+  </PropertyGroup>
+</Project>

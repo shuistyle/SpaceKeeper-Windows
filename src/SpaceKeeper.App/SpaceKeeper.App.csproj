@@ -1,0 +1,55 @@
+<!--
+  SpaceKeeper.App — the Windows app itself (WinUI 3 + Windows App SDK + .NET 10).
+
+  Key settings explained:
+  • UseWinUI                 – use WinUI 3, Microsoft's current UI framework for Windows 11 apps.
+  • WindowsPackageType=None  – a normal .exe you can unzip and run (no Microsoft Store/MSIX install).
+  • WindowsAppSDKSelfContained – bundle the Windows App SDK with the app, so nothing extra needs installing.
+  • Platforms x64;ARM64      – builds for Intel/AMD PCs and Arm PCs (e.g. Snapdragon laptops).
+
+  NuGet packages (downloaded automatically when building):
+  • Microsoft.WindowsAppSDK      – WinUI 3 and modern Windows APIs (windows, notifications).
+  • CommunityToolkit.Mvvm        – removes boilerplate for view models (see ViewModels/).
+  • H.NotifyIcon.WinUI           – the icon in the taskbar's notification area ("system tray").
+  • Slions.VirtualDesktop        – talks to Windows' virtual desktop system. Windows has no
+                                   public API for listing/renaming/switching desktops, so this
+                                   well-maintained open-source library handles the undocumented
+                                   parts and keeps up with Windows 11 updates.
+  Versions use "*" wildcards so each build picks up the latest fixes.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <RootNamespace>SpaceKeeper.App</RootNamespace>
+    <AssemblyName>SpaceKeeper</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\SpaceKeeper.ico</ApplicationIcon>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <!-- The virtual desktop library builds code at run time, so trimming must stay off. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.*" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.*" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.*" />
+    <PackageReference Include="Slions.VirtualDesktop" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SpaceKeeper.Core\SpaceKeeper.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

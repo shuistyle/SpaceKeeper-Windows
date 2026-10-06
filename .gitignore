@@ -1,0 +1,11 @@
+# Build output
+bin/
+obj/
+publish/
+*.zip
+# Visual Studio
+.vs/
+*.user
+# macOS clutter
+.DS_Store
+.fuse_hidden*

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  OverlayWindow.xaml — a small on-screen text box with no title bar.
+  Used twice (see OverlayWindow.xaml.cs):
+    • the desktop name LABEL that sits in a screen corner, and
+    • the switch BANNER that appears briefly when you change desktop.
+  Theme brushes mean it automatically follows light, dark and contrast themes.
+-->
+<Window
+    x:Class="SpaceKeeper.App.Views.OverlayWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="SpaceKeeper overlay">
+    <Border x:Name="Box"
+            Padding="18,8"
+            Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
+            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="TitleText" FontWeight="SemiBold" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
+            <TextBlock x:Name="SubtitleText" TextAlignment="Center" Visibility="Collapsed"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+    </Border>
+</Window>
