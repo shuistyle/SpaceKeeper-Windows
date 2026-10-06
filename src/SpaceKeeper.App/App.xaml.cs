@@ -55,14 +55,39 @@ public partial class App : Application
 
     public App()
     {
+        // If anything goes wrong that nothing else catches, show it rather
+        // than letting the app vanish silently (see Services/CrashReport.cs).
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            CrashReport.Show("and had to close", e.ExceptionObject as Exception);
+        UnhandledException += (_, e) =>
+        {
+            CrashReport.Show("and had to close", e.Exception);
+        };
+
         InitializeComponent();
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        try
+        {
+            Start();
+        }
+        catch (Exception ex)
+        {
+            CrashReport.Show("while starting", ex);
+            Exit();
+        }
+    }
+
+    /// <summary>Creates and connects every part of the app (called once, from OnLaunched).</summary>
+    private void Start()
+    {
         _singleInstance = new Mutex(true, @"Local\SpaceKeeper.SingleInstance", out var isFirstCopy);
         if (!isFirstCopy)
         {
+            // Say so, rather than appearing to do nothing.
+            CrashReport.Inform("SpaceKeeper is already running.\n\nClick its icon in the notification area (bottom-right of the taskbar; it may be under the ^ arrow), double-tap Ctrl, or press Ctrl+Alt+S.");
             Exit();
             return;
         }
@@ -113,7 +138,15 @@ public partial class App : Application
             if (e.PropertyName == nameof(MainViewModel.CurrentName)) UpdateLabel();
         };
 
-        CreateTrayIcon();
+        try
+        {
+            CreateTrayIcon();
+        }
+        catch (Exception ex)
+        {
+            // The app still works from double-tap Ctrl / Ctrl+Alt+S without the icon.
+            CrashReport.Show("while creating its notification-area icon (SpaceKeeper will keep running)", ex);
+        }
 
         // Show the panel on first launch so people can see the app started.
         _panel.ShowPanel();
@@ -130,7 +163,9 @@ public partial class App : Application
         _tray = new TaskbarIcon
         {
             ToolTipText = _viewModel?.TrayToolTip ?? "SpaceKeeper",
-            IconSource = new BitmapImage(new Uri("ms-appx:///Assets/SpaceKeeper.ico")),
+            // Loaded straight from the file next to SpaceKeeper.exe. (An "ms-appx:" address
+            // only works for apps installed as a package, which SpaceKeeper isn't.)
+            Icon = new System.Drawing.Icon(Path.Combine(AppContext.BaseDirectory, "Assets", "SpaceKeeper.ico")),
             NoLeftClickDelay = true,
             LeftClickCommand = new RelayCommand(() => _panel?.Toggle()),
             ContextMenuMode = ContextMenuMode.PopupMenu,
