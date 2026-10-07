@@ -42,11 +42,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.*" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.*" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
-    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.*" />
-    <PackageReference Include="Slions.VirtualDesktop" Version="*" />
+    <!-- EXACT versions (security): a build always uses exactly these, so a new
+         or tampered library release can't slip into SpaceKeeper unnoticed.
+         To update, change the number here (Dependabot on GitHub suggests
+         updates as pull requests — see .github/dependabot.yml).
+         Microsoft.Windows.SDK.BuildTools comes in automatically with the
+         Windows App SDK, at the version that SDK asks for. -->
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
+    <PackageReference Include="Slions.VirtualDesktop" Version="6.9.2" />
   </ItemGroup>
 
   <ItemGroup>

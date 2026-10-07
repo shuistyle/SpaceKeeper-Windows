@@ -1,0 +1,16 @@
+# Dependabot — GitHub checks once a week for newer versions of the libraries
+# (NuGet) and build tools (GitHub Actions) SpaceKeeper uses, and opens a pull
+# request for each one. Nothing changes until you review and merge it.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directories:
+      - /src/SpaceKeeper.App
+      - /src/SpaceKeeper.Core
+      - /tests/SpaceKeeper.Core.Tests
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

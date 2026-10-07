@@ -8,6 +8,13 @@
 #      "Artifacts" section (Actions tab on GitHub).
 # Pushing a version tag such as v1.0.0 also creates a GitHub Release with
 # both zips attached — that's the easiest download link to share.
+#
+# Security:
+#   • Read-only by default. Only the final "release" job may write to the
+#     repository, and only for version tags.
+#   • Every GitHub Action is pinned to an exact commit (the long number
+#     after @), so nobody can change the code a build runs by moving a tag.
+#     The comment after each shows the version. Dependabot proposes updates.
 # ======================================================================
 name: Build Windows app
 
@@ -19,14 +26,16 @@ on:
   workflow_dispatch:   # adds a "Run workflow" button on GitHub
 
 permissions:
-  contents: write      # needed to create Releases for version tags
+  contents: read       # least privilege: jobs can read the code, nothing more
 
 jobs:
   test:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262      # v4.4.0
+        with:
+          persist-credentials: false   # don't leave a GitHub token on the build machine
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
         with:
           dotnet-version: '10.0.x'
       - name: Run tests
@@ -43,8 +52,10 @@ jobs:
           - platform: ARM64
             rid: win-arm64
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262      # v4.4.0
+        with:
+          persist-credentials: false   # don't leave a GitHub token on the build machine
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
         with:
           dotnet-version: '10.0.x'
 
@@ -73,13 +84,24 @@ jobs:
         run: Compress-Archive -Path publish/${{ matrix.rid }}/* -DestinationPath SpaceKeeper-${{ matrix.rid }}.zip
 
       - name: Upload download
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4.6.2
         with:
           name: SpaceKeeper-${{ matrix.rid }}
           path: SpaceKeeper-${{ matrix.rid }}.zip
 
-      - name: Attach to release (version tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+  # Creates the GitHub Release for version tags. The ONLY job allowed to write.
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # to create the Release and attach the zips
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093   # v4.3.0
         with:
-          files: SpaceKeeper-${{ matrix.rid }}.zip
+          path: downloads
+          merge-multiple: true
+      - name: Attach to release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65   # v2.6.2
+        with:
+          files: downloads/SpaceKeeper-*.zip
