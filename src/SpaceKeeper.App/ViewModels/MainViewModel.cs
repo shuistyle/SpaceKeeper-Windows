@@ -352,7 +352,13 @@ public sealed partial class MainViewModel : ObservableObject
         foreach (var alert in fresh)
         {
             Announce?.Invoke(this, $"{alert.Title}. {alert.Message}");
-            if (Settings.NotifyPinMoves) NotificationService.Show(alert.Title, alert.Message);
+            // PRIVACY: Windows can show notifications on the lock screen, so they
+            // don't include desktop names; the details are in the panel.
+            if (Settings.NotifyPinMoves)
+                NotificationService.Show("A pinned desktop has moved",
+                    alert.Problem == PinProblem.Missing
+                        ? "A pinned desktop was closed. Open SpaceKeeper for details."
+                        : "A pinned desktop is out of order. Open SpaceKeeper for details.");
         }
         _notifiedAlerts = alerts.Select(a => a.Id).ToHashSet();
 
@@ -552,6 +558,10 @@ public sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Lets App.xaml.cs supply a live double-tap count for the report.</summary>
     public Func<string>? DoubleTapStatusSource { get; set; }
+
+    /// <summary>The report with your user folder written as %USERPROFILE% (for sharing).</summary>
+    public string SharableDiagnosticsReport =>
+        PrivacyText.Redact(DiagnosticsReport, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 
     public string DiagnosticsReport =>
         $"""

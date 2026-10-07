@@ -10,7 +10,9 @@
 # What it does:
 #   1. Installs the GitHub command-line tool (gh) with Homebrew if needed.
 #   2. Signs you in to GitHub in your browser (first time only).
-#   3. Commits the code (using your private GitHub "noreply" email address).
+#   3. Commits the code (using your private GitHub "noreply" email address),
+#      after checking nothing looks like a key or secret, then lists the
+#      files that will become public and asks you to confirm.
 #   4. Creates the repository and uploads the code. GitHub then builds the
 #      app automatically (see .github/workflows/build.yml).
 #   5. With a version (e.g. v1.0.0): tags it so GitHub publishes a Release.
@@ -48,6 +50,22 @@ git config user.name "${FULL_NAME}"
 git config user.email "${USER_ID}+${LOGIN}@users.noreply.github.com"
 
 git add -A
+
+# Safety check before anything is published: refuse files that look like
+# keys, certificates or secrets (by name or by content), even if .gitignore
+# missed them.
+RISKY_NAMES='\.(p12|pfx|pem|key|cer|crt|snk|mobileprovision|provisionprofile|ips)$|(^|/)\.env|crash\.log$|-map\.txt$|state\.json$|id_(rsa|ed25519)'
+RISKY_TEXT='BEGIN ([A-Z ]*)PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}'
+risky="$(git diff --cached --name-only | grep -E "$RISKY_NAMES" || true)"
+secrets="$(git diff --cached -G"$RISKY_TEXT" --name-only || true)"
+if [ -n "$risky$secrets" ]; then
+  echo "✗ Stopped: these files look like keys or secrets and must not be published:"
+  printf '%s\n' $risky $secrets | sort -u | sed 's/^/    /'
+  echo "  Remove them from the folder (or add them to .gitignore), then run this again."
+  git reset -q
+  exit 1
+fi
+
 if git diff --cached --quiet; then
   echo "> Nothing new to commit."
 else
@@ -57,6 +75,24 @@ else
     git commit -m "Initial commit: SpaceKeeper for Windows" >/dev/null
   fi
   echo "> Committed: $(git log -1 --pretty=%s)"
+fi
+
+# Show what will become PUBLIC and ask before uploading.
+if git remote get-url origin >/dev/null 2>&1; then
+  git fetch -q origin main 2>/dev/null || true
+fi
+if git rev-parse --verify -q origin/main >/dev/null; then RANGE="origin/main..HEAD"; else RANGE="HEAD"; fi
+CHANGED="$(git log --name-status --pretty=format: "$RANGE" 2>/dev/null | sed '/^$/d' | sort -u)"
+if [ -n "$CHANGED" ]; then
+  echo ""
+  echo "These files will be published to a PUBLIC repository (A = added, M = changed, D = deleted):"
+  echo "$CHANGED" | sed 's/^/    /'
+  echo ""
+  read -r -p "Publish them? [y/N] " answer
+  case "$answer" in
+    [yY]|[yY][eE][sS]) ;;
+    *) echo "Not published. Your commit is kept locally; run this again when ready."; exit 0 ;;
+  esac
 fi
 
 if git remote get-url origin >/dev/null 2>&1; then

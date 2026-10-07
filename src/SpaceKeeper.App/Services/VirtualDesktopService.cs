@@ -90,7 +90,8 @@ public sealed class VirtualDesktopService
     /// <summary>Renames a desktop in Windows itself — the name shows in Task View too.</summary>
     public bool Rename(Guid id, string name) => Try(() =>
     {
-        if (VirtualDesktop.FromId(id) is { } desktop) desktop.Name = name.Trim();
+        // Max 60 characters, no line breaks or control characters (Core/TextRules.cs).
+        if (VirtualDesktop.FromId(id) is { } desktop) desktop.Name = DesktopNames.Clean(name);
     });
 
     /// <summary>Adds a new desktop at the end. Returns its ID.</summary>

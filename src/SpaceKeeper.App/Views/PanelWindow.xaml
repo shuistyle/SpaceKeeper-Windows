@@ -245,13 +245,13 @@
                                            FontWeight="SemiBold"
                                            TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
                                            Visibility="{x:Bind views:Ui.CollapsedIf(IsRenaming), Mode=OneWay}" />
-                                <TextBox x:Name="NameBox" Grid.Row="1" VerticalAlignment="Center"
+                                <TextBox x:Name="NameBox" Grid.Row="1" VerticalAlignment="Center" MaxLength="60"
                                          Text="{x:Bind Name, Mode=OneWay}"
                                          PlaceholderText="{x:Bind DefaultName, Mode=OneWay}"
                                          FontSize="{x:Bind NameFontSize, Mode=OneWay}"
                                          Visibility="{x:Bind IsRenaming, Mode=OneWay}"
                                          AutomationProperties.Name="{x:Bind NameFieldLabel, Mode=OneWay}"
-                                         AutomationProperties.HelpText="Type a name and press Enter. Esc cancels."
+                                         AutomationProperties.HelpText="Type a name, up to 60 characters, and press Enter. Esc cancels."
                                          LostFocus="OnNameLostFocus"
                                          KeyDown="OnNameKeyDown" />
 

@@ -160,3 +160,35 @@ public class PanelTextSizeTests
         Assert.False(settings.ShowSwitchBanner);
     }
 }
+
+public class TextRulesTests
+{
+    [Fact]
+    public void Clean_TidiesLineBreaksTabsAndSpaces()
+    {
+        Assert.Equal("Mail and Calendar", DesktopNames.Clean("  Mail\n\tand   Calendar\r\n"));
+    }
+
+    [Fact]
+    public void Clean_CutsAt60Characters()
+    {
+        Assert.Equal(60, DesktopNames.Clean(new string('a', 200)).Length);
+    }
+
+    [Fact]
+    public void Clean_KeepsEmojiWhole()
+    {
+        var name = string.Concat(Enumerable.Repeat("👩‍💻", 70));
+        var cleaned = DesktopNames.Clean(name);
+        Assert.Equal(string.Concat(Enumerable.Repeat("👩‍💻", 60)), cleaned);
+    }
+
+    [Fact]
+    public void Redact_HidesUserFolderAndName()
+    {
+        var text = @"Saved data: C:\Users\AndrewFlowerdew\AppData\Local\SpaceKeeper\state.json (AndrewFlowerdew)";
+        var redacted = PrivacyText.Redact(text, @"C:\Users\AndrewFlowerdew");
+        Assert.DoesNotContain("AndrewFlowerdew", redacted);
+        Assert.Contains(@"%USERPROFILE%\AppData", redacted);
+    }
+}

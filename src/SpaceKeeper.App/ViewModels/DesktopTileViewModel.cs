@@ -146,7 +146,7 @@ public sealed partial class DesktopTileViewModel : ObservableObject
     {
         if (!IsRenaming) return;
         IsRenaming = false;
-        text = text.Trim();
+        text = DesktopNames.Clean(text); // max 60 characters, no line breaks
         if (text == Name.Trim()) return;
         Owner.Rename(Id, text);
     }

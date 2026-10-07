@@ -505,12 +505,12 @@ public sealed partial class PanelWindow : Window
     }
 
     private void OnDiagnosticsExpanding(Expander sender, ExpanderExpandingEventArgs args) =>
-        DiagnosticsText.Text = ViewModel.DiagnosticsReport;
+        DiagnosticsText.Text = ViewModel.SharableDiagnosticsReport;
 
     private void OnCopyDiagnostics(object sender, RoutedEventArgs e)
     {
         var package = new DataPackage();
-        package.SetText(ViewModel.DiagnosticsReport);
+        package.SetText(ViewModel.SharableDiagnosticsReport);
         Clipboard.SetContent(package);
         Announce("Diagnostics report copied");
     }

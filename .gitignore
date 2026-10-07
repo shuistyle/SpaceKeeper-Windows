@@ -9,3 +9,18 @@ publish/
 # macOS clutter
 .DS_Store
 .fuse_hidden*
+
+# Never publish keys, certificates, crash reports, saved state or secrets
+*.p12
+*.pfx
+*.pem
+*.key
+*.snk
+*.cer
+*.crt
+*.ips
+*-map.txt
+crash.log
+state.json
+.env
+.env.*

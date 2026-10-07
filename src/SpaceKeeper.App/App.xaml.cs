@@ -43,6 +43,7 @@ public partial class App : Application
 {
     // Only one copy of SpaceKeeper may run at a time.
     private static Mutex? _singleInstance;
+    private static bool _ownsSingleInstance;
 
     private VirtualDesktopService? _desktops;
     private MainViewModel? _viewModel;
@@ -85,16 +86,41 @@ public partial class App : Application
         }
     }
 
+    /// <summary>Is another SpaceKeeper.exe running in this Windows session?</summary>
+    private static bool AnotherSpaceKeeperIsRunning()
+    {
+        using var me = System.Diagnostics.Process.GetCurrentProcess();
+        foreach (var process in System.Diagnostics.Process.GetProcessesByName("SpaceKeeper"))
+        {
+            using (process)
+            {
+                if (process.Id != me.Id && process.SessionId == me.SessionId) return true;
+            }
+        }
+        return false;
+    }
+
     /// <summary>Creates and connects every part of the app (called once, from OnLaunched).</summary>
     private void Start()
     {
-        _singleInstance = new Mutex(true, @"Local\SpaceKeeper.SingleInstance", out var isFirstCopy);
+        // "Only one copy at a time" marker. Its name includes your Windows account
+        // ID, and if it's taken we check a SpaceKeeper is REALLY running — so
+        // another program can't stop SpaceKeeper starting by grabbing the name.
+        var userId = System.Security.Principal.WindowsIdentity.GetCurrent().User?.Value ?? "user";
+        _singleInstance = new Mutex(true, $@"Local\SpaceKeeper.SingleInstance.{userId}", out var isFirstCopy);
         if (!isFirstCopy && Environment.GetCommandLineArgs().Contains(InstallService.AfterInstallArgument))
         {
             // Just installed: the copy that installed us is closing — wait for it.
             try { isFirstCopy = _singleInstance.WaitOne(TimeSpan.FromSeconds(10)); }
             catch (AbandonedMutexException) { isFirstCopy = true; } // it closed without tidying up
         }
+        if (!isFirstCopy && !AnotherSpaceKeeperIsRunning())
+        {
+            // The name is held, but not by SpaceKeeper: start anyway.
+            isFirstCopy = true;
+            _singleInstance = null;
+        }
+        _ownsSingleInstance = isFirstCopy && _singleInstance is not null;
         if (!isFirstCopy)
         {
             // Say so, rather than appearing to do nothing.
@@ -229,7 +255,7 @@ public partial class App : Application
         _label?.Close();
         _banner?.Close();
         _panel?.CloseForReal();
-        _singleInstance?.ReleaseMutex();
+        if (_ownsSingleInstance) _singleInstance?.ReleaseMutex();
         Exit();
     }
 }
