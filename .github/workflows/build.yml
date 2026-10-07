@@ -44,6 +44,10 @@ jobs:
   build:
     needs: test
     runs-on: windows-latest
+    permissions:
+      contents: read
+      id-token: write       # lets GitHub vouch for this build (attestation below)
+      attestations: write   # stores that proof with the repository
     strategy:
       matrix:
         include:
@@ -83,6 +87,16 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path publish/${{ matrix.rid }}/* -DestinationPath SpaceKeeper-${{ matrix.rid }}.zip
 
+      # Proof of origin: GitHub records that this exact zip was built by this
+      # workflow from this repository. Anyone can check a download with
+      #   gh attestation verify SpaceKeeper-win-x64.zip --repo shuistyle/SpaceKeeper-Windows
+      # (Skipped for pull requests, which can't create attestations.)
+      - name: Record build provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be   # v2.4.0
+        with:
+          subject-path: SpaceKeeper-${{ matrix.rid }}.zip
+
       - name: Upload download
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4.6.2
         with:
@@ -101,7 +115,26 @@ jobs:
         with:
           path: downloads
           merge-multiple: true
+      # A checksum list, so a download can be checked for damage or tampering.
+      - name: Make SHA256SUMS.txt
+        working-directory: downloads
+        run: sha256sum SpaceKeeper-*.zip > SHA256SUMS.txt && cat SHA256SUMS.txt
       - name: Attach to release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65   # v2.6.2
         with:
-          files: downloads/SpaceKeeper-*.zip
+          files: |
+            downloads/SpaceKeeper-*.zip
+            downloads/SHA256SUMS.txt
+          body: |
+            **Download:** `SpaceKeeper-win-x64.zip` for most PCs, `SpaceKeeper-win-arm64.zip` for Arm PCs (e.g. Snapdragon, or Windows on an Apple-silicon Mac).
+
+            **Check your download** (optional) — in PowerShell, in the folder with the zip:
+            ```
+            Get-FileHash .\SpaceKeeper-win-x64.zip
+            ```
+            The result must match the line for that file in `SHA256SUMS.txt`. With the GitHub CLI you can also confirm it was built here:
+            ```
+            gh attestation verify SpaceKeeper-win-x64.zip --repo ${{ github.repository }}
+            ```
+
+            **Then:** extract the zip, run `SpaceKeeper.exe`, and click **Install** in its panel, which copies it to your private apps folder so it can start safely at sign-in.

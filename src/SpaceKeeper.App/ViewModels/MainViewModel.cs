@@ -487,6 +487,14 @@ public sealed partial class MainViewModel : ObservableObject
         get => _launchAtSignIn;
         set
         {
+            // SECURITY: don't start automatically from a folder that other things
+            // can change (OneDrive, Downloads…) — see Services/InstallService.cs.
+            if (value && InstallService.RiskyLocationReason is { } reason)
+            {
+                StatusMessage = $"{reason} Click “Install” first, then turn on Launch at sign-in.";
+                OnPropertyChanged();
+                return;
+            }
             try
             {
                 StartupService.SetEnabled(value);
@@ -513,6 +521,32 @@ public sealed partial class MainViewModel : ObservableObject
     // DIAGNOSTICS — shown in the panel's "Diagnostics" expander
     // ------------------------------------------------------------------
 
+    // ------------------------------------------------------------------
+    // INSTALL — copy SpaceKeeper to a safe, private folder (InstallService)
+    // ------------------------------------------------------------------
+
+    /// <summary>Show the "Install SpaceKeeper" bar? (Not when already installed.)</summary>
+    public bool ShowInstallPrompt => !InstallService.IsInstalled;
+
+    /// <summary>The bar's text: a warning for risky folders, a suggestion otherwise.</summary>
+    public string InstallPromptText => InstallService.RiskyLocationReason is { } reason
+        ? $"{reason} Install it to your own private apps folder before using Launch at sign-in."
+        : "Install SpaceKeeper to your own private apps folder so it can start safely at sign-in.";
+
+    /// <summary>Raised after the installed copy has started; App.xaml.cs then closes this copy.</summary>
+    public event EventHandler? InstallStarted;
+
+    [RelayCommand]
+    private void Install()
+    {
+        if (InstallService.InstallAndStart() is { } error)
+        {
+            StatusMessage = error;
+            return;
+        }
+        InstallStarted?.Invoke(this, EventArgs.Empty);
+    }
+
     public string HotKeyStatus { get; set; } = "off";
     public string DoubleTapStatus { get; set; } = "off";
 
@@ -527,6 +561,7 @@ public sealed partial class MainViewModel : ObservableObject
         Ctrl+Alt+S: {HotKeyStatus}
         Tile size: {Settings.PanelTextSize}, Windows text size {AccessibilityInfo.TextScale:P0}
         Saved data: {_store.FilePath}
+        Running from: {InstallService.CurrentFolder} ({(InstallService.IsInstalled ? "installed" : InstallService.RiskyLocationReason ?? "not installed")})
         Pins: {_state.Pins.Count}, custom list order: {(HasCustomOrder ? "yes" : "no")}
         """;
 }

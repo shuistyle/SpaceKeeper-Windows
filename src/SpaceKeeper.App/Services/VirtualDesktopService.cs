@@ -41,8 +41,20 @@ public sealed class VirtualDesktopService
         _ui = ui;
         try
         {
-            // Prepares the library for this exact Windows build.
-            VirtualDesktop.Configure();
+            // Prepares the library for this exact Windows build. The library
+            // generates a little code to match your Windows version. By default
+            // it saves that code as a DLL file and loads it again next time, so
+            // another program could swap the file and get its own code run
+            // inside SpaceKeeper. SECURITY: keep the generated code in memory
+            // only (SaveCompiledAssembly = false), and point the "saved code"
+            // folder at a random folder that doesn't exist, because the library
+            // loads any DLL it finds in that folder even when saving is off.
+            VirtualDesktop.Configure(new WindowsDesktop.Properties.VirtualDesktopConfiguration
+            {
+                SaveCompiledAssembly = false,
+                CompiledAssemblySaveDirectory = new DirectoryInfo(
+                    Path.Combine(Path.GetTempPath(), "SpaceKeeper-no-saved-code-" + Guid.NewGuid().ToString("N"))),
+            });
             VirtualDesktop.CurrentChanged += (_, _) => _ui.TryEnqueue(() => CurrentChanged?.Invoke(this, EventArgs.Empty));
         }
         catch (Exception ex)

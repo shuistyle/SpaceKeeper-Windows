@@ -36,11 +36,16 @@ GitHub builds the app for you:
 2. GitHub builds SpaceKeeper automatically, which takes about 5–10 minutes. Open the repository's **Actions** tab, select the latest run and download **SpaceKeeper-win-x64** (or **win-arm64** for Arm PCs such as Snapdragon laptops) from **Artifacts**.
 3. For a permanent download link, publish a version: `bash publish_to_github.sh SpaceKeeper-Windows v1.0.0`. The zips then appear under **Releases**.
 
-On the Windows PC: unzip the download anywhere, for example `C:\Users\<you>\Apps\SpaceKeeper`, and run **SpaceKeeper.exe**.
+On the Windows PC:
 
-> **Windows SmartScreen** may say it "protected your PC" because the app isn't code-signed with a paid certificate. Click **More info** › **Run anyway**. This only happens the first time.
+1. **Check the download (recommended).** Each release includes `SHA256SUMS.txt`. In PowerShell, in the folder with the zip, run `Get-FileHash .\SpaceKeeper-win-x64.zip` (or `-arm64`) and check the result matches that file's line in `SHA256SUMS.txt`. With the GitHub CLI you can also confirm the zip was built by this repository's GitHub workflow: `gh attestation verify SpaceKeeper-win-x64.zip --repo shuistyle/SpaceKeeper-Windows`.
+2. **Extract the zip** (right-click › Extract All) and run **SpaceKeeper.exe**.
+3. **Click Install** in the panel. SpaceKeeper copies itself to `%LOCALAPPDATA%\Programs\SpaceKeeper`, a private folder only your Windows account can change, and restarts from there. You can then delete the extracted folder.
+4. Turn on **Launch at sign-in** in the panel's settings so SpaceKeeper starts automatically.
 
-Turn on **Launch at sign-in** in the panel's settings so SpaceKeeper starts automatically.
+> **Why install?** A Windows app loads the files next to it. Running from OneDrive (which syncs files in from the cloud and other devices), Downloads or a temporary folder would let a changed file there run inside SpaceKeeper, which can see your keyboard. So Launch at sign-in is only allowed from a safe folder.
+
+> **Windows SmartScreen** may say it "protected your PC", because the app isn't code-signed. Check the download as in step 1 first; if it matches, click **More info** › **Run anyway**. This only happens the first time.
 
 ## Building on Windows yourself
 
@@ -98,6 +103,8 @@ src/SpaceKeeper.App/             the Windows app (WinUI 3)
   Services/DoubleTapCtrlService.cs  double-tap Ctrl (one-handed shortcut)
   Services/HotKeyService.cs      Ctrl+Alt+S
   Services/SystemServices.cs     sign-in launch, notifications, accessibility settings
+  Services/InstallService.cs     "Install": copies SpaceKeeper to a safe private folder
+  Services/CrashReport.cs        shows and logs start-up problems
   Services/Win32.cs              direct calls into Windows functions
 tests/SpaceKeeper.Core.Tests/    automatic tests (run on every GitHub build)
 .github/workflows/build.yml      the automatic GitHub build

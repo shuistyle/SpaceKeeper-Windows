@@ -89,6 +89,12 @@ public partial class App : Application
     private void Start()
     {
         _singleInstance = new Mutex(true, @"Local\SpaceKeeper.SingleInstance", out var isFirstCopy);
+        if (!isFirstCopy && Environment.GetCommandLineArgs().Contains(InstallService.AfterInstallArgument))
+        {
+            // Just installed: the copy that installed us is closing — wait for it.
+            try { isFirstCopy = _singleInstance.WaitOne(TimeSpan.FromSeconds(10)); }
+            catch (AbandonedMutexException) { isFirstCopy = true; } // it closed without tidying up
+        }
         if (!isFirstCopy)
         {
             // Say so, rather than appearing to do nothing.
@@ -96,6 +102,10 @@ public partial class App : Application
             Exit();
             return;
         }
+
+        // Running from the installed copy: if "Launch at sign-in" was switched on
+        // from an older, uninstalled copy, point it here instead.
+        if (InstallService.IsInstalled && StartupService.IsEnabled) StartupService.SetEnabled(true);
 
         var ui = DispatcherQueue.GetForCurrentThread();
         _desktops = new VirtualDesktopService(ui);
@@ -112,6 +122,7 @@ public partial class App : Application
         _hotKey.Pressed += (_, _) => _panel.Toggle();
         ApplyHotKeySetting();
         _viewModel.HotKeySettingChanged += (_, _) => ApplyHotKeySetting();
+        _viewModel.InstallStarted += (_, _) => Quit(); // the installed copy takes over
         _viewModel.DoubleTapStatusSource = DoubleTapStatus;
 
         // On-screen label and switch banner.

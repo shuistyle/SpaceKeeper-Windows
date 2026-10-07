@@ -82,6 +82,19 @@
                     </InfoBar.Content>
                 </InfoBar>
 
+                <!-- ===== INSTALL prompt (security: see Services/InstallService.cs) ===== -->
+                <InfoBar IsOpen="{x:Bind ViewModel.ShowInstallPrompt, Mode=OneWay}"
+                         Severity="Informational"
+                         IsClosable="True"
+                         Title="Install SpaceKeeper"
+                         Message="{x:Bind ViewModel.InstallPromptText, Mode=OneWay}">
+                    <InfoBar.ActionButton>
+                        <Button Content="Install" Command="{x:Bind ViewModel.InstallCommand}"
+                                AutomationProperties.Name="Install SpaceKeeper to your apps folder"
+                                ToolTipService.ToolTip="Copies SpaceKeeper to AppData\Local\Programs\SpaceKeeper and restarts it from there." />
+                    </InfoBar.ActionButton>
+                </InfoBar>
+
                 <!-- ===== DESKTOPS heading, count and Add button ===== -->
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
