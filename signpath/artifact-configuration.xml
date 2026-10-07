@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignPath artifact configuration for SpaceKeeper for Windows.
+  A reference copy: paste this into the SignPath project
+  (Project › Artifact configurations › Edit) once SignPath Foundation has
+  accepted the project. It tells SignPath to sign ONLY SpaceKeeper's own
+  files, and only if their embedded product name and version match.
+
+  The GitHub workflow uploads the contents of the publish folder, which
+  GitHub packs as a zip — hence the <zip-file> root. ${version} comes from
+  the "version" parameter the workflow passes (the release tag without "v").
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file path="SpaceKeeper.exe" product-name="SpaceKeeper" product-version="${version}">
+      <authenticode-sign/>
+    </pe-file>
+    <pe-file path="SpaceKeeper.dll" product-name="SpaceKeeper" product-version="${version}">
+      <authenticode-sign/>
+    </pe-file>
+    <pe-file path="SpaceKeeper.Core.dll" product-name="SpaceKeeper" product-version="${version}">
+      <authenticode-sign/>
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

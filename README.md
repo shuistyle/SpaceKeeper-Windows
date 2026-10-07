@@ -28,6 +28,12 @@ SpaceKeeper lives in the notification area ("tray") at the right of the taskbar.
 - **No 16-desktop limit:** Add desktop is never greyed out.
 - **"Pin" means something different:** in Windows, pinning usually means showing a window on every desktop. In SpaceKeeper, a pin keeps a desktop's **place in the order**.
 
+## Code signing and licence
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/). See the [code signing policy](CODE_SIGNING_POLICY.md) for what is signed, who approves releases, and the privacy policy. *(Signing starts once SignPath Foundation has accepted the project; until then releases are unsigned.)*
+
+SpaceKeeper for Windows is open source under the [MIT licence](LICENSE).
+
 ## Getting the app (no Windows development tools needed)
 
 GitHub builds the app for you:
