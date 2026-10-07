@@ -45,7 +45,7 @@ On the Windows PC:
 
 > **Why install?** A Windows app loads the files next to it. Running from OneDrive (which syncs files in from the cloud and other devices), Downloads or a temporary folder would let a changed file there run inside SpaceKeeper, which can see your keyboard. So Launch at sign-in is only allowed from a safe folder.
 
-> **Windows SmartScreen** may say it "protected your PC", because the app isn't code-signed. Check the download as in step 1 first; if it matches, click **More info** › **Run anyway**. This only happens the first time.
+> **Windows SmartScreen** says "Windows protected your PC" because the app isn't code-signed, so Windows doesn't know who made it. Check the download as in step 1 first; if it matches, click **More info** › **Run anyway**. The warning comes from the "downloaded from the internet" mark Windows puts on the zip, so it appears each time you run a freshly extracted copy. Once you click **Install**, the installed copy no longer has that mark and starts without the warning. (To avoid it from the start, right-click the zip › **Properties** › tick **Unblock** › **OK** before extracting — only after checking the download.)
 
 ## Building on Windows yourself
 

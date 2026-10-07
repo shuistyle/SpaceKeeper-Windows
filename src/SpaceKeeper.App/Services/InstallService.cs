@@ -87,10 +87,23 @@ public static class InstallService
     {
         Directory.CreateDirectory(to);
         foreach (var file in Directory.EnumerateFiles(from))
-            File.Copy(file, Path.Combine(to, Path.GetFileName(file)), overwrite: true);
+        {
+            var target = Path.Combine(to, Path.GetFileName(file));
+            File.Copy(file, target, overwrite: true);
+            RemoveDownloadMark(target);
+        }
         foreach (var dir in Directory.EnumerateDirectories(from))
             CopyFolder(dir, Path.Combine(to, Path.GetFileName(dir)));
     }
+
+    /// <summary>
+    /// Files from the internet carry a hidden "downloaded from the internet"
+    /// mark (the Zone.Identifier stream). That mark is what makes SmartScreen
+    /// warn every time the app starts. You've already chosen to run this copy,
+    /// so the INSTALLED copy has the mark removed — otherwise the warning would
+    /// also appear at every sign-in. (Your downloaded zip keeps its mark.)
+    /// </summary>
+    private static void RemoveDownloadMark(string file) => Win32.DeleteFile(file + ":Zone.Identifier");
 
     private static string Normalise(string path) =>
         Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;

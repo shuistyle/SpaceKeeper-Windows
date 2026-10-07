@@ -114,6 +114,11 @@ internal static class Win32
     [DllImport("user32.dll")]
     public static extern bool BringWindowToTop(IntPtr hWnd);
 
+    // --- Files --------------------------------------------------------------
+    // Used to remove the "downloaded from the internet" mark (InstallService).
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern bool DeleteFile(string path);
+
     // --- Listening to a window's messages ("subclassing") ---------------
     // Windows sends a WM_HOTKEY message to our window when the hotkey is
     // pressed. A subclass procedure lets us see those messages.
