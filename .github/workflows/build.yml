@@ -99,7 +99,8 @@ jobs:
             throw "SpaceKeeper.pri is missing from the published app, so its windows can't load."
           }
 
-      # ---- Code signing (SignPath Foundation; see CODE_SIGNING_POLICY.md) ----
+      # ---- Optional code signing via SignPath (not set up: these steps only run
+      # if a SIGNPATH_API_TOKEN secret is added to the repository) ----
       # 1. Hand the unsigned files to GitHub, 2. ask SignPath to sign
       # SpaceKeeper's own files (a person approves each release in SignPath),
       # 3. put the signed files back in place and check the signature.
