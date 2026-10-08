@@ -181,15 +181,10 @@ jobs:
             downloads/SpaceKeeper-*.zip
             downloads/SHA256SUMS.txt
           body: |
-            **Download:** `SpaceKeeper-win-x64.zip` for most PCs, `SpaceKeeper-win-arm64.zip` for Arm PCs (e.g. Snapdragon, or Windows on an Apple-silicon Mac).
+            **Install or update** — paste into PowerShell (no warning, no administrator rights needed):
+            ```
+            powershell -c "irm https://raw.githubusercontent.com/${{ github.repository }}/main/install.ps1 | iex"
+            ```
+            It picks the right download for your PC, checks it against `SHA256SUMS.txt`, installs it to your private apps folder and starts it.
 
-            **Check your download** (optional) — in PowerShell, in the folder with the zip:
-            ```
-            Get-FileHash .\SpaceKeeper-win-x64.zip
-            ```
-            The result must match the line for that file in `SHA256SUMS.txt`. With the GitHub CLI you can also confirm it was built here:
-            ```
-            gh attestation verify SpaceKeeper-win-x64.zip --repo ${{ github.repository }}
-            ```
-
-            **Then:** extract the zip, run `SpaceKeeper.exe`, and click **Install** in its panel, which copies it to your private apps folder so it can start safely at sign-in.
+            **Or download by hand:** `SpaceKeeper-win-x64.zip` for most PCs, `SpaceKeeper-win-arm64.zip` for Arm PCs (e.g. Snapdragon, or Windows on an Apple-silicon Mac). Check it with `Get-FileHash .\SpaceKeeper-win-x64.zip` against `SHA256SUMS.txt` (or `gh attestation verify SpaceKeeper-win-x64.zip --repo ${{ github.repository }}`), then extract, run `SpaceKeeper.exe` and click **Install** in its panel.

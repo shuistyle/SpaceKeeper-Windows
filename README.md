@@ -42,16 +42,35 @@ GitHub builds the app for you:
 2. GitHub builds SpaceKeeper automatically, which takes about 5–10 minutes. Open the repository's **Actions** tab, select the latest run and download **SpaceKeeper-win-x64** (or **win-arm64** for Arm PCs such as Snapdragon laptops) from **Artifacts**.
 3. For a permanent download link, publish a version: `bash publish_to_github.sh SpaceKeeper-Windows v1.0.0`. The zips then appear under **Releases**.
 
-On the Windows PC:
+### Install on a Windows PC (recommended)
 
-1. **Check the download (recommended).** Each release includes `SHA256SUMS.txt`. In PowerShell, in the folder with the zip, run `Get-FileHash .\SpaceKeeper-win-x64.zip` (or `-arm64`) and check the result matches that file's line in `SHA256SUMS.txt`. With the GitHub CLI you can also confirm the zip was built by this repository's GitHub workflow: `gh attestation verify SpaceKeeper-win-x64.zip --repo shuistyle/SpaceKeeper-Windows`.
-2. **Extract the zip** (right-click › Extract All) and run **SpaceKeeper.exe**.
-3. **Click Install** in the panel. SpaceKeeper copies itself to `%LOCALAPPDATA%\Programs\SpaceKeeper`, a private folder only your Windows account can change, and restarts from there. You can then delete the extracted folder.
-4. Turn on **Launch at sign-in** in the panel's settings so SpaceKeeper starts automatically.
+Press **Win+X** › **Terminal** (or open PowerShell) and paste:
+
+```
+powershell -c "irm https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1 | iex"
+```
+
+It downloads the latest release for your PC (x64 or Arm), **checks it against the published SHA-256 checksum** (and stops if it doesn't match), installs it to `%LOCALAPPDATA%\Programs\SpaceKeeper` (a private folder only your Windows account can change), adds it to the Start menu and starts it. No administrator rights needed, and **no "Windows protected your PC" warning**: that warning only appears for files a web browser has marked as downloaded from the internet, and the checksum check takes its place. Run the same command again to update. Your settings are kept.
+
+To remove SpaceKeeper:
+
+```
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1))) -Uninstall
+```
+
+(add `-RemoveSettings` to delete your saved settings too). You can read exactly what the script does in [install.ps1](install.ps1).
+
+Then turn on **Launch at sign-in** in the panel's settings so SpaceKeeper starts automatically.
+
+### Or download the zip by hand
+
+1. **Check the download.** Each release includes `SHA256SUMS.txt`. In PowerShell, in the folder with the zip, run `Get-FileHash .\SpaceKeeper-win-x64.zip` (or `-arm64`) and check the result matches that file's line in `SHA256SUMS.txt`. With the GitHub CLI you can also confirm the zip was built by this repository's GitHub workflow: `gh attestation verify SpaceKeeper-win-x64.zip --repo shuistyle/SpaceKeeper-Windows`.
+2. **Unblock it** (right-click the zip › Properties › tick **Unblock** › OK) to avoid the SmartScreen warning, then **extract** it and run **SpaceKeeper.exe**. (Without Unblock, Windows says "Windows protected your PC" because the app isn't code-signed; click **More info** › **Run anyway**.)
+3. **Click Install** in the panel. SpaceKeeper copies itself to `%LOCALAPPDATA%\Programs\SpaceKeeper` and restarts from there; you can then delete the extracted folder.
 
 > **Why install?** A Windows app loads the files next to it. Running from OneDrive (which syncs files in from the cloud and other devices), Downloads or a temporary folder would let a changed file there run inside SpaceKeeper, which can see your keyboard. So Launch at sign-in is only allowed from a safe folder.
 
-> **Windows SmartScreen** says "Windows protected your PC" because the app isn't code-signed, so Windows doesn't know who made it. Check the download as in step 1 first; if it matches, click **More info** › **Run anyway**. The warning comes from the "downloaded from the internet" mark Windows puts on the zip, so it appears each time you run a freshly extracted copy. Once you click **Install**, the installed copy no longer has that mark and starts without the warning. (To avoid it from the start, right-click the zip › **Properties** › tick **Unblock** › **OK** before extracting — only after checking the download.)
+> **Smart App Control:** on PCs where Windows' Smart App Control is switched on, unsigned apps can be blocked however they're installed. Most PCs have it off.
 
 ## Building on Windows yourself
 
