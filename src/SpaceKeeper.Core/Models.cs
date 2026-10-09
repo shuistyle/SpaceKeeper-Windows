@@ -152,5 +152,8 @@ public sealed class SavedState
     /// <summary>Last known names, used to describe a pinned desktop after it's closed.</summary>
     public Dictionary<Guid, string> LastKnownNames { get; set; } = [];
 
+    /// <summary>Each desktop's tile colour, by colour ID (see DesktopColors.cs).</summary>
+    public Dictionary<Guid, string> DesktopColors { get; set; } = [];
+
     public AppSettings Settings { get; set; } = new();
 }

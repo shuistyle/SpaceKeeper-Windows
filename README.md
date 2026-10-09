@@ -7,6 +7,7 @@ A Windows 11 tray app to **name, pin, reorder, add and remove virtual desktops**
 | Feature | How it works on Windows |
 |---|---|
 | **See every desktop at once** | The panel shows your desktops as a grid of tiles, up to 8 in a row, so 16 desktops fit in two rows with no scrolling. With very large tiles it switches to 4 (or 2) in a row. |
+| **Colour-code desktops** | Right-click a tile › **Colour** to fill it with one of ten colours chosen for low vision and colour blindness: every colour keeps its text at 7:1 contrast or better (WCAG AAA, checked by an automatic test), and each has its own symbol (circle, square, triangle…) and name, so colour is never the only clue. With a Windows contrast theme on, tiles use the theme's colours instead. |
 | **Name desktops** | Double-click a tile (or select it and press F2) and type a name. Windows 11 stores it, so the same name appears in Task View (Win+Tab) too. |
 | **Switch** | Click a tile, or select it and press Enter. Windows plays its usual slide animation. |
 | **Add / remove** | **Add desktop** (or Ctrl+N) adds a desktop. It's never greyed out, because Windows has no maximum number of desktops (macOS stops at 16). The **×** on a tile, then **Remove**, closes that desktop, and Windows moves its windows to a neighbouring desktop. |

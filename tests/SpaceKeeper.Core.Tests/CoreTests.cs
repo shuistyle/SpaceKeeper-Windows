@@ -192,3 +192,31 @@ public class TextRulesTests
         Assert.Contains(@"%USERPROFILE%\AppData", redacted);
     }
 }
+
+public class DesktopColorTests
+{
+    [Fact]
+    public void ContrastIsAtLeast7To1()
+    {
+        foreach (var color in DesktopColors.All)
+        {
+            var contrast = DesktopColors.Contrast(color, againstBlack: color.UsesDarkText);
+            Assert.True(contrast >= 7.0, $"{color.Name}: {contrast:F2}:1");
+        }
+    }
+
+    [Fact]
+    public void IdsNamesAndSymbolsAreUnique()
+    {
+        Assert.Equal(DesktopColors.All.Count, DesktopColors.All.Select(c => c.Id).Distinct().Count());
+        Assert.Equal(DesktopColors.All.Count, DesktopColors.All.Select(c => c.Name).Distinct().Count());
+        Assert.Equal(DesktopColors.All.Count, DesktopColors.All.Select(c => c.Symbol).Distinct().Count());
+    }
+
+    [Fact]
+    public void UnknownIdIsIgnored()
+    {
+        Assert.Null(DesktopColors.Find("ultraviolet"));
+        Assert.Equal("Navy", DesktopColors.Find("navy")?.Name);
+    }
+}

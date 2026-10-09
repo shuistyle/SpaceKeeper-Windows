@@ -212,6 +212,21 @@ public sealed partial class MainViewModel : ObservableObject
     // ------------------------------------------------------------------
 
     public bool IsPinned(Guid id) => _state.Pins.ContainsKey(id);
+
+    /// <summary>A desktop's tile colour ID, or null.</summary>
+    public string? ColorId(Guid id) => _state.DesktopColors.TryGetValue(id, out var colorId) ? colorId : null;
+
+    /// <summary>Sets (or, with null, removes) a desktop's tile colour, and tells screen readers.</summary>
+    public void SetColor(Guid id, string? colorId)
+    {
+        var color = DesktopColors.Find(colorId);
+        if (color is null) _state.DesktopColors.Remove(id);
+        else _state.DesktopColors[id] = color.Id;
+        Save();
+        foreach (var tile in Tiles.Where(t => t.Id == id)) tile.RefreshState();
+        var name = _live.FirstOrDefault(d => d.Id == id)?.DisplayName ?? "Desktop";
+        Announce?.Invoke(this, $"{name}: {color?.Name ?? "no colour"}");
+    }
     public bool IsOutOfOrder(Guid id) => PinAlerts.Any(a => a.Id == id);
     public bool CanRemove => _live.Count > 1 && !IsChangingDesktops;
     public bool CanMove(Guid id, int offset) => ListOrder.CanMove(ListOrder.Apply(_live, _state.ListOrder), id, offset);
@@ -265,6 +280,7 @@ public sealed partial class MainViewModel : ObservableObject
             _state.Pins = PinEvaluator.RemovePin(_state.Pins, id);
             _state.ListOrder.Remove(id);
             _state.LastKnownNames.Remove(id);
+            _state.DesktopColors.Remove(id);
             Save();
             StatusMessage = $"Removed “{name}”. Its windows moved to a neighbouring desktop.";
         }

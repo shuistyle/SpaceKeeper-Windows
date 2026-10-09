@@ -127,7 +127,7 @@
                         </StackPanel>
                     </Button>
                 </Grid>
-                <TextBlock Text="Click to switch · double-click or F2 to rename · drag, right-click or Alt+Shift+arrows to reorder"
+                <TextBlock Text="Click to switch · double-click or F2 to rename · drag, right-click or Alt+Shift+arrows to reorder · right-click › Colour"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            TextWrapping="Wrap" />
@@ -182,7 +182,7 @@
                             <Grid Width="{x:Bind TileWidth, Mode=OneWay}"
                                   Height="{x:Bind TileHeight, Mode=OneWay}"
                                   Padding="6" RowSpacing="2" CornerRadius="8"
-                                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                  Background="{x:Bind views:Ui.TileFill(ColorId), Mode=OneWay}"
                                   BorderBrush="{x:Bind views:Ui.TileBorder(IsCurrent), Mode=OneWay}"
                                   BorderThickness="{x:Bind views:Ui.TileBorderThickness(IsCurrent), Mode=OneWay}"
                                   Tapped="OnTileTapped"
@@ -198,6 +198,51 @@
                                         <MenuFlyoutItem Text="{x:Bind SwitchLabel, Mode=OneWay}" Command="{x:Bind SwitchCommand}" IsEnabled="{x:Bind CanSwitch, Mode=OneWay}" />
                                         <MenuFlyoutItem Text="Rename…" Command="{x:Bind RenameCommand}" />
                                         <MenuFlyoutItem Text="{x:Bind PinLabel, Mode=OneWay}" Command="{x:Bind TogglePinCommand}" />
+                                        <!-- Colour: each with its symbol and name (SpaceKeeper.Core/DesktopColors.cs). -->
+                                        <MenuFlyoutSubItem Text="Colour">
+                                            <ToggleMenuFlyoutItem Text="None" Command="{x:Bind SetColorCommand}" CommandParameter=""
+                                                                  IsChecked="{x:Bind views:Ui.HasNoColor(ColorId), Mode=OneWay}" />
+                                            <ToggleMenuFlyoutItem Text="Yellow" Command="{x:Bind SetColorCommand}" CommandParameter="yellow"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'yellow'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="●" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Orange" Command="{x:Bind SetColorCommand}" CommandParameter="orange"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'orange'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="■" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Sky blue" Command="{x:Bind SetColorCommand}" CommandParameter="skyBlue"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'skyBlue'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="▲" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Mint" Command="{x:Bind SetColorCommand}" CommandParameter="mint"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'mint'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="◆" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Pink" Command="{x:Bind SetColorCommand}" CommandParameter="pink"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'pink'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="♥" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Navy" Command="{x:Bind SetColorCommand}" CommandParameter="navy"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'navy'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="★" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Plum" Command="{x:Bind SetColorCommand}" CommandParameter="plum"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'plum'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="⬢" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Forest" Command="{x:Bind SetColorCommand}" CommandParameter="forest"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'forest'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="⬟" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Brick" Command="{x:Bind SetColorCommand}" CommandParameter="brick"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'brick'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="♣" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                            <ToggleMenuFlyoutItem Text="Slate" Command="{x:Bind SetColorCommand}" CommandParameter="slate"
+                                                                  IsChecked="{x:Bind views:Ui.IsColor(ColorId, 'slate'), Mode=OneWay}">
+                                                <ToggleMenuFlyoutItem.Icon><FontIcon FontFamily="Segoe UI Symbol" Glyph="✚" /></ToggleMenuFlyoutItem.Icon>
+                                            </ToggleMenuFlyoutItem>
+                                        </MenuFlyoutSubItem>
                                         <MenuFlyoutSeparator />
                                         <MenuFlyoutItem Text="Move earlier" Command="{x:Bind MoveEarlierCommand}" IsEnabled="{x:Bind CanMoveEarlier, Mode=OneWay}" />
                                         <MenuFlyoutItem Text="Move later" Command="{x:Bind MoveLaterCommand}" IsEnabled="{x:Bind CanMoveLater, Mode=OneWay}" />
@@ -220,21 +265,30 @@
                                         <TextBlock Text="{x:Bind Index.ToString(), Mode=OneWay}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    FontWeight="SemiBold" FontSize="{x:Bind SmallFontSize, Mode=OneWay}"
-                                                   Foreground="{x:Bind views:Ui.BadgeText(IsCurrent), Mode=OneWay}" />
+                                                   Foreground="{x:Bind views:Ui.BadgeText(IsCurrent, ColorId), Mode=OneWay}" />
                                     </Grid>
+                                    <!-- The colour's own symbol, so colour is never the only clue. -->
+                                    <TextBlock Grid.Column="1" Margin="6,0,0,0" VerticalAlignment="Center"
+                                               FontFamily="Segoe UI Symbol"
+                                               Text="{x:Bind ColorSymbol, Mode=OneWay}"
+                                               FontSize="{x:Bind IconFontSize, Mode=OneWay}"
+                                               Foreground="{x:Bind views:Ui.TileText(ColorId, x:False), Mode=OneWay}"
+                                               Visibility="{x:Bind HasColor, Mode=OneWay}"
+                                               AutomationProperties.AccessibilityView="Raw" />
                                     <Button Grid.Column="2" Style="{StaticResource IconButtonStyle}"
                                             Command="{x:Bind TogglePinCommand}"
                                             AutomationProperties.Name="{x:Bind PinLabel, Mode=OneWay}"
                                             ToolTipService.ToolTip="{x:Bind PinLabel, Mode=OneWay}">
                                         <FontIcon Glyph="{x:Bind PinGlyph, Mode=OneWay}" FontSize="{x:Bind IconFontSize, Mode=OneWay}"
-                                                  Foreground="{x:Bind views:Ui.PinBrush(IsPinned, IsOutOfOrder), Mode=OneWay}" />
+                                                  Foreground="{x:Bind views:Ui.PinBrush(IsPinned, IsOutOfOrder, ColorId), Mode=OneWay}" />
                                     </Button>
                                     <Button Grid.Column="3" Style="{StaticResource IconButtonStyle}"
                                             Command="{x:Bind RequestRemoveCommand}"
                                             IsEnabled="{x:Bind CanRemove, Mode=OneWay}"
                                             AutomationProperties.Name="{x:Bind RemoveLabel, Mode=OneWay}"
                                             ToolTipService.ToolTip="{x:Bind RemoveLabel, Mode=OneWay}">
-                                        <FontIcon Glyph="&#xE711;" FontSize="{x:Bind IconFontSize, Mode=OneWay}" />
+                                        <FontIcon Glyph="&#xE711;" FontSize="{x:Bind IconFontSize, Mode=OneWay}"
+                                                  Foreground="{x:Bind views:Ui.TileText(ColorId, x:False), Mode=OneWay}" />
                                     </Button>
                                 </Grid>
 
@@ -243,6 +297,7 @@
                                            Text="{x:Bind DisplayName, Mode=OneWay}"
                                            FontSize="{x:Bind NameFontSize, Mode=OneWay}"
                                            FontWeight="SemiBold"
+                                           Foreground="{x:Bind views:Ui.TileText(ColorId, x:False), Mode=OneWay}"
                                            TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
                                            Visibility="{x:Bind views:Ui.CollapsedIf(IsRenaming), Mode=OneWay}" />
                                 <TextBox x:Name="NameBox" Grid.Row="1" VerticalAlignment="Center" MaxLength="60"
@@ -259,7 +314,7 @@
                                 <TextBlock Grid.Row="2"
                                            Text="{x:Bind Subtitle, Mode=OneWay}"
                                            FontSize="{x:Bind SmallFontSize, Mode=OneWay}"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           Foreground="{x:Bind views:Ui.TileText(ColorId, x:True), Mode=OneWay}"
                                            TextTrimming="CharacterEllipsis" />
 
                                 <!-- After clicking remove: a two-step confirmation covering the tile. -->

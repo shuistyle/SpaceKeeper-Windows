@@ -9,6 +9,8 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using SpaceKeeper.App.Services;
+using SpaceKeeper.Core;
 
 namespace SpaceKeeper.App.Views;
 
@@ -22,13 +24,49 @@ public static class Ui
     /// <summary>
     /// Pin icon colour. The icon's SHAPE also changes (pin / filled pin /
     /// crossed-out pin), so the meaning never depends on colour alone.
+    /// On a coloured tile it uses the tile's text colour, to keep 7:1 contrast.
     /// </summary>
-    public static Brush PinBrush(bool pinned, bool outOfOrder) =>
-        Theme(outOfOrder ? "SystemFillColorCautionBrush" : pinned ? "AccentTextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush");
+    public static Brush PinBrush(bool pinned, bool outOfOrder, string? colorId) =>
+        Effective(colorId) is { } color ? Plain(color.UsesDarkText)
+        : Theme(outOfOrder ? "SystemFillColorCautionBrush" : pinned ? "AccentTextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush");
 
-    /// <summary>Number colour inside the badge: white on the accent circle, normal text otherwise.</summary>
-    public static Brush BadgeText(bool isCurrent) =>
-        Theme(isCurrent ? "TextOnAccentFillColorPrimaryBrush" : "TextFillColorPrimaryBrush");
+    /// <summary>Number colour inside the badge: white on the accent circle, the tile's text colour otherwise.</summary>
+    public static Brush BadgeText(bool isCurrent, string? colorId) =>
+        isCurrent ? Theme("TextOnAccentFillColorPrimaryBrush")
+        : Effective(colorId) is { } color ? Plain(color.UsesDarkText) : Theme("TextFillColorPrimaryBrush");
+
+    // ----- Desktop colours (SpaceKeeper.Core/DesktopColors.cs) -----
+
+    /// <summary>
+    /// The colour actually used for a tile. With a Windows CONTRAST THEME on,
+    /// tiles ignore their colours and use the theme's own colours instead —
+    /// the person has chosen those colours for a reason.
+    /// </summary>
+    private static DesktopColor? Effective(string? colorId) =>
+        AccessibilityInfo.HighContrast ? null : DesktopColors.Find(colorId);
+
+    /// <summary>Tile background: its colour, or the normal card background.</summary>
+    public static Brush TileFill(string? colorId) =>
+        Effective(colorId) is { } color
+            ? new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, color.R, color.G, color.B))
+            : Theme("CardBackgroundFillColorDefaultBrush");
+
+    /// <summary>
+    /// Text on a tile: black or white on a coloured tile (always at least 7:1
+    /// contrast), otherwise the normal text colour (secondary for the subtitle).
+    /// </summary>
+    public static Brush TileText(string? colorId, bool secondary) =>
+        Effective(colorId) is { } color ? Plain(color.UsesDarkText)
+        : Theme(secondary ? "TextFillColorSecondaryBrush" : "TextFillColorPrimaryBrush");
+
+    /// <summary>Is this the tile's colour? (Ticks the right item in the Colour menu.)</summary>
+    public static bool IsColor(string? colorId, string id) => colorId == id;
+
+    /// <summary>True when the tile has no colour (the "None" item in the Colour menu).</summary>
+    public static bool HasNoColor(string? colorId) => DesktopColors.Find(colorId) is null;
+
+    private static Brush Plain(bool black) =>
+        new SolidColorBrush(black ? Microsoft.UI.Colors.Black : Microsoft.UI.Colors.White);
 
     /// <summary>Tile border: the accent colour for the current desktop, a faint line otherwise.</summary>
     public static Brush TileBorder(bool isCurrent) =>

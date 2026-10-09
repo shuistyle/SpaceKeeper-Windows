@@ -78,8 +78,19 @@ public sealed partial class DesktopTileViewModel : ObservableObject
             DisplayName != DefaultName ? DefaultName : null,
             IsCurrent ? "current" : null,
             IsPinned ? "pinned" : null,
+            ColorName is { } colour ? $"colour {colour}" : null,
             IsOutOfOrder ? "out of pinned order" : null,
         }.Where(s => s is not null));
+
+    // ----- Colour (SpaceKeeper.Core/DesktopColors.cs) -----
+    /// <summary>The tile's colour ID (e.g. "navy"), or null for none.</summary>
+    public string? ColorId => Owner.ColorId(Id);
+    public bool HasColor => DesktopColors.Find(ColorId) is not null;
+    public string ColorSymbol => DesktopColors.Find(ColorId)?.Symbol ?? "";
+    public string? ColorName => DesktopColors.Find(ColorId)?.Name;
+
+    /// <summary>Sets the colour from the Colour menu ("" = none).</summary>
+    [RelayCommand] private void SetColor(string? id) => Owner.SetColor(Id, string.IsNullOrEmpty(id) ? null : id);
     public string TileHelp => IsCurrent
         ? "Double-click or press F2 to rename. Alt+Shift+arrow keys move it in the grid."
         : "Click or press Enter to switch. Double-click or press F2 to rename. Alt+Shift+arrow keys move it in the grid.";
@@ -126,6 +137,7 @@ public sealed partial class DesktopTileViewModel : ObservableObject
             nameof(CanSwitch), nameof(CanRemove), nameof(CanMoveEarlier), nameof(CanMoveLater),
             nameof(TileWidth), nameof(TileHeight), nameof(NameFontSize), nameof(SmallFontSize),
             nameof(IconFontSize), nameof(BadgeSize),
+            nameof(ColorId), nameof(HasColor), nameof(ColorSymbol), nameof(ColorName),
         })
         {
             OnPropertyChanged(p);
