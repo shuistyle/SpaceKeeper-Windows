@@ -1,29 +1,34 @@
-<#
-  install.ps1 - installs (or updates, or removes) SpaceKeeper for Windows.
-
-  INSTALL or UPDATE - paste this into PowerShell (no administrator needed):
-      powershell -c "irm https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1 | iex"
-
-  REMOVE:
-      & ([scriptblock]::Create((irm https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1))) -Uninstall
-
-  WHAT IT DOES
-    1. Finds the latest release on GitHub (or the one you ask for with -Version v1.0.7).
-    2. Picks the right download for this PC (x64 for Intel/AMD, arm64 for Arm).
-    3. Downloads it and CHECKS it against the published SHA-256 checksum.
-       If they don't match, it stops and installs nothing.
-    4. Installs to %LOCALAPPDATA%\Programs\SpaceKeeper - a private folder only
-       your Windows account can change (the same place SpaceKeeper's own
-       Install button uses). Your settings are kept.
-    5. Adds SpaceKeeper to the Start menu and starts it.
-
-  WHY THIS AVOIDS THE "WINDOWS PROTECTED YOUR PC" WARNING
-    That warning appears because web browsers mark downloaded files as "from
-    the internet". PowerShell doesn't add that mark, and the checksum check
-    above replaces the protection the warning was meant to give.
-
-  Nothing is sent anywhere except the downloads from github.com.
-#>
+# ======================================================================
+# install.ps1 - installs (or updates, or removes) SpaceKeeper for Windows.
+#
+# INSTALL or UPDATE - paste this into PowerShell or Command Prompt
+# (no administrator rights needed):
+#   powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((iwr -UseBasicParsing https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1).Content))"
+#
+# REMOVE: the same, with -Uninstall at the very end (inside the quotes).
+#
+# (The command downloads this script as one piece of text and runs it, which
+# works the same in Windows PowerShell 5.1 and PowerShell 7, from either
+# Command Prompt or PowerShell. "-ExecutionPolicy Bypass" applies only to
+# this one run.)
+#
+# WHAT IT DOES
+#   1. Finds the latest release on GitHub (or the one you ask for with -Version v1.0.8).
+#   2. Picks the right download for this PC (x64 for Intel/AMD, arm64 for Arm).
+#   3. Downloads it and CHECKS it against the published SHA-256 checksum.
+#      If they don't match, it stops and installs nothing.
+#   4. Installs to %LOCALAPPDATA%\Programs\SpaceKeeper - a private folder only
+#      your Windows account can change (the same place SpaceKeeper's own
+#      Install button uses). Your settings are kept.
+#   5. Adds SpaceKeeper to the Start menu and starts it.
+#
+# WHY THIS AVOIDS THE "WINDOWS PROTECTED YOUR PC" WARNING
+#   That warning appears because web browsers mark downloaded files as "from
+#   the internet". PowerShell doesn't add that mark, and the checksum check
+#   above replaces the protection the warning was meant to give.
+#
+# Nothing is sent anywhere except the downloads from github.com.
+# ======================================================================
 [CmdletBinding()]
 param(
     [string]$Version = "latest",   # e.g. v1.0.7

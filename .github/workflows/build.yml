@@ -184,7 +184,7 @@ jobs:
           body: |
             **Install or update** — paste into PowerShell (no warning, no administrator rights needed):
             ```
-            powershell -c "irm https://raw.githubusercontent.com/${{ github.repository }}/main/install.ps1 | iex"
+            powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((iwr -UseBasicParsing https://raw.githubusercontent.com/${{ github.repository }}/main/install.ps1).Content))"
             ```
             It picks the right download for your PC, checks it against `SHA256SUMS.txt`, installs it to your private apps folder and starts it.
 

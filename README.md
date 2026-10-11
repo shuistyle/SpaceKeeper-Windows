@@ -43,10 +43,10 @@ GitHub builds the app for you:
 
 ### Install on a Windows PC (recommended)
 
-Press **Win+X** › **Terminal** (or open PowerShell) and paste:
+Press **Win+X** › **Terminal** (PowerShell or Command Prompt both work) and paste:
 
 ```
-powershell -c "irm https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((iwr -UseBasicParsing https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1).Content))"
 ```
 
 It downloads the latest release for your PC (x64 or Arm), **checks it against the published SHA-256 checksum** (and stops if it doesn't match), installs it to `%LOCALAPPDATA%\Programs\SpaceKeeper` (a private folder only your Windows account can change), adds it to the Start menu and starts it. No administrator rights needed, and **no "Windows protected your PC" warning**: that warning only appears for files a web browser has marked as downloaded from the internet, and the checksum check takes its place. Run the same command again to update. Your settings are kept.
@@ -54,10 +54,10 @@ It downloads the latest release for your PC (x64 or Arm), **checks it against th
 To remove SpaceKeeper:
 
 ```
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1))) -Uninstall
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((iwr -UseBasicParsing https://raw.githubusercontent.com/shuistyle/SpaceKeeper-Windows/main/install.ps1).Content)) -Uninstall"
 ```
 
-(add `-RemoveSettings` to delete your saved settings too). You can read exactly what the script does in [install.ps1](install.ps1).
+(put `-Uninstall -RemoveSettings` at the end instead to delete your saved settings too). You can read exactly what the script does in [install.ps1](install.ps1).
 
 Then turn on **Launch at sign-in** in the panel's settings so SpaceKeeper starts automatically.
 
