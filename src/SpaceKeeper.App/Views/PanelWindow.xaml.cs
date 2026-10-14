@@ -357,22 +357,53 @@ public sealed partial class PanelWindow : Window
     // Renaming
     // ------------------------------------------------------------------
 
-    /// <summary>Puts the cursor in a tile's name box with the old name selected.</summary>
-    private void FocusNameBox(DesktopTileViewModel tile)
+    /// <summary>The tile whose name box is still being given focus (see FocusNameBox).</summary>
+    private DesktopTileViewModel? _settlingRename;
+
+    /// <summary>
+    /// Puts the cursor in a tile's name box with the old name selected, so you
+    /// can type straight away. The box has only just become visible, and the
+    /// tile you double-clicked (or the right-click menu as it closes) can take
+    /// focus back a moment later, so for about half a second this keeps
+    /// putting the cursor back, until you start typing.
+    /// </summary>
+    private async void FocusNameBox(DesktopTileViewModel tile)
     {
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        _settlingRename = tile;
+        TextBox? box = null;
+        try
         {
-            if (Find<TextBox>(Container(tile), "NameBox") is not { } box) return;
-            box.Text = tile.Name;
-            box.Focus(FocusState.Programmatic);
-            box.SelectAll();
-        });
+            for (var attempt = 0; attempt < 12 && tile.IsRenaming; attempt++)
+            {
+                await Task.Delay(40); // let the screen update first
+                if (box is null)
+                {
+                    box = Find<TextBox>(Container(tile), "NameBox");
+                    if (box is null) continue;
+                    box.Text = tile.Name;
+                }
+                if (box.Text != tile.Name) break; // you've started typing
+                if (box.FocusState == FocusState.Unfocused)
+                {
+                    box.Focus(FocusState.Programmatic);
+                    box.SelectAll();
+                }
+            }
+        }
+        finally
+        {
+            if (_settlingRename == tile) _settlingRename = null;
+        }
     }
 
     /// <summary>Rename when you click away from the name box…</summary>
     private void OnNameLostFocus(object sender, RoutedEventArgs e)
     {
-        if (sender is TextBox { DataContext: DesktopTileViewModel tile } box) tile.CommitName(box.Text);
+        if (sender is not TextBox { DataContext: DesktopTileViewModel tile } box) return;
+        // Focus moving away while the box is still appearing isn't you
+        // clicking away: FocusNameBox puts it back, so don't end renaming.
+        if (_settlingRename == tile) return;
+        tile.CommitName(box.Text);
     }
 
     /// <summary>…or press Enter in it.</summary>
