@@ -231,11 +231,16 @@ public sealed partial class MainViewModel : ObservableObject
     public bool CanRemove => _live.Count > 1 && !IsChangingDesktops;
     public bool CanMove(Guid id, int offset) => ListOrder.CanMove(ListOrder.Apply(_live, _state.ListOrder), id, offset);
 
-    public void SwitchTo(Guid id)
+    public async Task SwitchToAsync(Guid id)
     {
+        // Hand focus to the taskbar BEFORE the panel closes; otherwise focus
+        // returns to the app you were using, and PowerPoint (and other Office
+        // apps) can pull Windows back to that desktop. See VirtualDesktopService.
+        VirtualDesktopService.ParkFocusOnTaskbar();
         HideRequested?.Invoke(this, EventArgs.Empty);
-        if (!_desktops.Switch(id)) StatusMessage = "Windows didn't switch desktop. Try again.";
-        else StatusMessage = null;
+        StatusMessage = await _desktops.SwitchReliablyAsync(id)
+            ? null
+            : "Windows didn't stay on that desktop. Try again.";
     }
 
     /// <summary>Asks the panel to show a tile's name box (double-click, F2, right-click › Rename).</summary>

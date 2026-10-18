@@ -87,6 +87,93 @@ public sealed class VirtualDesktopService
     /// <summary>Switches to a desktop (Windows plays its usual slide animation).</summary>
     public bool Switch(Guid id) => Try(() => VirtualDesktop.FromId(id)?.Switch());
 
+    /// <summary>The desktop you're on now, or null if Windows can't say.</summary>
+    public Guid? CurrentId
+    {
+        get
+        {
+            if (!IsAvailable) return null;
+            try { return VirtualDesktop.Current.Id; }
+            catch (Exception) { return null; }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Switching even when PowerPoint (or another Office app) is in front
+    // ------------------------------------------------------------------
+    // When SpaceKeeper's panel closes, Windows gives focus back to the app
+    // you were using. Office apps such as PowerPoint then grab focus for
+    // their own window while the desktops are sliding, and Windows follows
+    // that window straight back to the desktop you were leaving. So:
+    //   1. ParkFocusOnTaskbar(): before the panel closes, hand focus to the
+    //      taskbar, which is on every desktop and doesn't pull you back;
+    //   2. switch, then wait a moment and check you're still there (Office
+    //      pulls back a fraction of a second later); if not, try once more;
+    //   3. give focus to the top window on the new desktop, so you can carry
+    //      on typing there.
+
+    /// <summary>Gives keyboard focus to the taskbar. Call while SpaceKeeper is still the active app.</summary>
+    public static void ParkFocusOnTaskbar()
+    {
+        var taskbar = Win32.FindWindow("Shell_TrayWnd", null);
+        if (taskbar != IntPtr.Zero) Win32.SetForegroundWindow(taskbar);
+    }
+
+    /// <summary>
+    /// Switches and checks the switch stuck (see above). Returns false if
+    /// Windows still isn't on that desktop after two tries.
+    /// </summary>
+    public async Task<bool> SwitchReliablyAsync(Guid id)
+    {
+        if (!IsAvailable) return false;
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            if (attempt > 0) ParkFocusOnTaskbar();
+            if (!Switch(id)) return false;
+
+            // Wait for the switch (up to ~1 second)…
+            for (var i = 0; i < 10 && CurrentId != id; i++) await Task.Delay(100);
+            // …then make sure nothing pulled us back.
+            await Task.Delay(400);
+            if (CurrentId == id)
+            {
+                FocusTopWindowOn(id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// If focus is still on the taskbar, gives it to the window you used
+    /// most recently on that desktop (the highest one on screen).
+    /// </summary>
+    private static void FocusTopWindowOn(Guid id)
+    {
+        try
+        {
+            var taskbar = Win32.FindWindow("Shell_TrayWnd", null);
+            if (Win32.GetForegroundWindow() != taskbar) return; // Windows already chose a window
+
+            // Top-level windows, from the front to the back.
+            for (var hwnd = Win32.GetTopWindow(IntPtr.Zero); hwnd != IntPtr.Zero; hwnd = Win32.GetWindow(hwnd, Win32.GW_HWNDNEXT))
+            {
+                if (!Win32.IsWindowVisible(hwnd) || Win32.IsIconic(hwnd)) continue;
+                if (Win32.GetWindow(hwnd, Win32.GW_OWNER) != IntPtr.Zero) continue; // dialogs and pop-ups
+                var exStyle = (long)Win32.GetWindowLongPtr(hwnd, Win32.GWL_EXSTYLE);
+                if ((exStyle & Win32.WS_EX_TOOLWINDOW) != 0) continue;            // tool windows, our overlays
+                if (VirtualDesktop.IsPinnedWindow(hwnd)) continue;                // on every desktop
+                if (VirtualDesktop.FromHwnd(hwnd)?.Id != id) continue;
+                Win32.SetForegroundWindow(hwnd);
+                return;
+            }
+        }
+        catch (Exception)
+        {
+            // Not important enough to fail the switch for.
+        }
+    }
+
     /// <summary>Renames a desktop in Windows itself — the name shows in Task View too.</summary>
     public bool Rename(Guid id, string name) => Try(() =>
     {

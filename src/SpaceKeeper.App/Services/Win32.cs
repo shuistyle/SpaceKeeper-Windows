@@ -114,6 +114,25 @@ internal static class Win32
     [DllImport("user32.dll")]
     public static extern bool BringWindowToTop(IntPtr hWnd);
 
+    // --- Switching desktops reliably (VirtualDesktopService) ---------------
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern IntPtr FindWindow(string? className, string? windowName);
+
+    public const uint GW_HWNDNEXT = 2;
+    public const uint GW_OWNER = 4;
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetTopWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetWindow(IntPtr hWnd, uint command);
+
+    [DllImport("user32.dll")]
+    public static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr hWnd);
+
     // --- Files --------------------------------------------------------------
     // Used to remove the "downloaded from the internet" mark (InstallService).
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]

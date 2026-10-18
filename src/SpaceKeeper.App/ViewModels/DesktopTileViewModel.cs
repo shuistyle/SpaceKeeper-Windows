@@ -173,7 +173,7 @@ public sealed partial class DesktopTileViewModel : ObservableObject
     // ----- Commands for the buttons and right-click menu -----
     // [RelayCommand] turns each method into a Command, e.g. Switch() → SwitchCommand.
 
-    [RelayCommand] private void Switch() => Owner.SwitchTo(Id);
+    [RelayCommand] private Task Switch() => Owner.SwitchToAsync(Id);
     [RelayCommand] private void Rename() => Owner.RequestRename(this);
     [RelayCommand] private void TogglePin() => Owner.TogglePin(Id);
     [RelayCommand] private void RequestRemove() => Owner.RequestRemove(this);
