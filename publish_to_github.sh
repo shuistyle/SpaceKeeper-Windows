@@ -15,7 +15,8 @@
 #      files that will become public and asks you to confirm.
 #   4. Creates the repository and uploads the code. GitHub then builds the
 #      app automatically (see .github/workflows/build.yml).
-#   5. With a version (e.g. v1.0.0): tags it so GitHub publishes a Release.
+#   5. Turns on the project website (GitHub Pages, from the docs/ folder).
+#   6. With a version (e.g. v1.0.0): tags it so GitHub publishes a Release.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -103,6 +104,18 @@ else
   gh repo create "${REPO_NAME}" --public --description "${DESCRIPTION}" --source . --remote origin --push
 fi
 
+# Website: publish the docs/ folder with GitHub Pages (free for public repos)
+SITE_URL="https://${LOGIN}.github.io/${REPO_NAME}/"
+if [ -f docs/index.html ]; then
+  if ! gh api "repos/${LOGIN}/${REPO_NAME}/pages" >/dev/null 2>&1; then
+    echo "> Turning on the website (GitHub Pages from the docs folder)..."
+    gh api -X POST "repos/${LOGIN}/${REPO_NAME}/pages" \
+      -f "source[branch]=main" -f "source[path]=/docs" >/dev/null 2>&1 \
+      || echo "  Couldn't turn on Pages automatically. On GitHub: Settings > Pages > Branch: main, folder: /docs > Save."
+  fi
+  gh repo edit "${LOGIN}/${REPO_NAME}" --homepage "${SITE_URL}" >/dev/null 2>&1 || true
+fi
+
 if [ -n "${VERSION}" ]; then
   echo "> Tagging ${VERSION} (GitHub will build it and publish a Release)..."
   git tag -a "${VERSION}" -m "SpaceKeeper for Windows ${VERSION}"
@@ -112,6 +125,7 @@ fi
 echo ""
 echo "Done!"
 echo "  Code:   https://github.com/${LOGIN}/${REPO_NAME}"
+echo "  Website: ${SITE_URL}  (the first build can take a minute or two)"
 echo "  Builds: https://github.com/${LOGIN}/${REPO_NAME}/actions  (about 5-10 minutes)"
 if [ -n "${VERSION}" ]; then
   echo "  Download: https://github.com/${LOGIN}/${REPO_NAME}/releases/tag/${VERSION}"

@@ -1,5 +1,7 @@
 # SpaceKeeper for Windows
 
+**Website and install instructions: <https://shuistyle.github.io/SpaceKeeper-Windows/>**
+
 A Windows 11 tray app to **name, pin, reorder, add and remove virtual desktops**. It's the Windows companion to SpaceKeeper for Mac, built with current Microsoft technology: **WinUI 3**, the **Windows App SDK** and **.NET 10**, using the MVVM pattern.
 
 ## What it does
