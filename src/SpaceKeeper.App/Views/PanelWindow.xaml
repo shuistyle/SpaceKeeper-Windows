@@ -398,38 +398,10 @@
                         <StackPanel x:Name="SettingsColumnB" Grid.Column="1" Spacing="8">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Show desktop name label" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw" />
-                                <ToggleSwitch Grid.Column="1" MinWidth="0" OnContent="" OffContent=""
-                                              IsOn="{x:Bind ViewModel.ShowDesktopLabel, Mode=TwoWay}"
-                                              AutomationProperties.Name="Show desktop name label" />
-                            </Grid>
-                            <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.ShowDesktopLabel, Mode=OneWay}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                    <TextBlock Text="Label corner" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw" />
-                                    <ComboBox Grid.Column="1" MinWidth="150"
-                                              SelectedIndex="{x:Bind ViewModel.LabelCornerIndex, Mode=TwoWay}"
-                                              AutomationProperties.Name="Label corner">
-                                        <ComboBoxItem Content="Top left" />
-                                        <ComboBoxItem Content="Top right" />
-                                        <ComboBoxItem Content="Bottom left" />
-                                        <ComboBoxItem Content="Bottom right" />
-                                    </ComboBox>
-                                </Grid>
-                                <Grid>
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                    <TextBlock Text="Label opacity" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw" />
-                                    <Slider Grid.Column="1" Width="150" Minimum="30" Maximum="100" StepFrequency="5"
-                                            Value="{x:Bind ViewModel.LabelOpacityPercent, Mode=TwoWay}"
-                                            AutomationProperties.Name="Label opacity, percent" />
-                                </Grid>
-                            </StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Label and banner size" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw" />
+                                <TextBlock Text="Switch banner size" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw" />
                                 <ComboBox Grid.Column="1" MinWidth="150"
                                           SelectedIndex="{x:Bind ViewModel.TextSizeIndex, Mode=TwoWay}"
-                                          AutomationProperties.Name="Label and banner text size">
+                                          AutomationProperties.Name="Switch banner text size">
                                     <ComboBoxItem Content="Standard" />
                                     <ComboBoxItem Content="Large" />
                                     <ComboBoxItem Content="Extra large" />

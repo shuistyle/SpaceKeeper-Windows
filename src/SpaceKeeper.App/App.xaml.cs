@@ -9,7 +9,7 @@
 //   MainViewModel          the "brain": data + actions          (ViewModels/)
 //          │
 //   PanelWindow            the panel you click on                (Views/)
-//   OverlayWindow ×2       the corner label + the switch banner  (Views/)
+//   OverlayWindow          the switch banner  (Views/)
 //   TaskbarIcon            the icon in the notification area ("tray")
 //   DoubleTapCtrlService   double-tap Ctrl from any app (one hand) (Services/)
 //   HotKeyService          Ctrl+Alt+S from any app (backup)       (Services/)
@@ -48,7 +48,6 @@ public partial class App : Application
     private VirtualDesktopService? _desktops;
     private MainViewModel? _viewModel;
     private PanelWindow? _panel;
-    private OverlayWindow? _label;
     private OverlayWindow? _banner;
     private TaskbarIcon? _tray;
     private HotKeyService? _hotKey;
@@ -151,18 +150,16 @@ public partial class App : Application
         _viewModel.InstallStarted += (_, _) => Quit(); // the installed copy takes over
         _viewModel.DoubleTapStatusSource = DoubleTapStatus;
 
-        // On-screen label and switch banner.
-        _label = OverlayWindow.CreateLabel(_desktops);
+        // The banner that shows the desktop's name for a moment after you switch.
+        // (There's no permanent on-screen name any more: it could cover
+        // controls in other apps and on web pages.)
         _banner = OverlayWindow.CreateBanner(_desktops);
-        UpdateLabel();
-        _viewModel.OverlaySettingsChanged += (_, _) => UpdateLabel();
         _viewModel.SwitchedDesktop += (_, desktop) =>
         {
-            UpdateLabel();
             if (_viewModel.Settings.ShowSwitchBanner)
             {
                 var subtitle = desktop.Name.Length > 0 ? desktop.DefaultName : null;
-                _banner.ShowBanner(desktop.DisplayName, subtitle, _viewModel.Settings.OverlayPoints.Banner);
+                _banner.ShowBanner(desktop.DisplayName, subtitle, _viewModel.Settings.BannerPoints);
             }
             _panel.Announce($"{desktop.DisplayName}, {desktop.DefaultName}");
         };
@@ -170,14 +167,13 @@ public partial class App : Application
         // Screen-reader announcements come out of the panel window.
         _viewModel.Announce += (_, text) => _panel.Announce(text);
 
-        // Keep the tray tooltip and the label up to date (e.g. after a rename).
+        // Keep the tray tooltip up to date (e.g. after a rename).
         _viewModel.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(MainViewModel.TrayToolTip) && _tray is not null)
             {
                 _tray.ToolTipText = _viewModel.TrayToolTip;
             }
-            if (e.PropertyName == nameof(MainViewModel.CurrentName)) UpdateLabel();
         };
 
         try
@@ -232,19 +228,6 @@ public partial class App : Application
         _doubleTap is null ? "off" :
         _doubleTap.Status == "listening" ? $"listening ({_doubleTap.PressCount} double taps so far)" : _doubleTap.Status;
 
-    /// <summary>Shows, hides or updates the corner label to match the settings and current desktop.</summary>
-    private void UpdateLabel()
-    {
-        if (_label is null || _viewModel is null) return;
-        var settings = _viewModel.Settings;
-        if (!settings.ShowDesktopLabel || _viewModel.Current is null)
-        {
-            _label.HideOverlay();
-            return;
-        }
-        _label.ShowLabel(_viewModel.CurrentName, settings.OverlayPoints.Label, settings.LabelCorner, settings.LabelOpacity);
-    }
-
     /// <summary>Closes everything cleanly. Called from the tray menu and the panel's Quit button.</summary>
     public void Quit()
     {
@@ -252,7 +235,6 @@ public partial class App : Application
         _hotKey?.Dispose();
         _tray?.Dispose();
         NotificationService.Unregister();
-        _label?.Close();
         _banner?.Close();
         _panel?.CloseForReal();
         if (_ownsSingleInstance) _singleInstance?.ReleaseMutex();

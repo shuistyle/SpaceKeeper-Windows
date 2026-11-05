@@ -116,12 +116,27 @@ public class StateStoreTests
     {
         var path = Path.Combine(Path.GetTempPath(), $"sk-{Guid.NewGuid()}.json");
         var store = new StateStore(path);
-        var state = new SavedState { Settings = { LabelCorner = LabelCorner.TopRight } };
+        var state = new SavedState { Settings = { OverlayTextSize = OverlayTextSize.Large } };
         state.Pins[Guid.NewGuid()] = 0;
         store.Save(state);
         var loaded = store.Load();
-        Assert.Equal(LabelCorner.TopRight, loaded.Settings.LabelCorner);
+        Assert.Equal(OverlayTextSize.Large, loaded.Settings.OverlayTextSize);
         Assert.Single(loaded.Pins);
+        File.Delete(path);
+    }
+
+    [Fact]
+    public void OldFileWithRemovedLabelSettings_StillLoads()
+    {
+        // Settings files from versions that had the corner name label.
+        var path = Path.Combine(Path.GetTempPath(), $"sk-{Guid.NewGuid()}.json");
+        File.WriteAllText(path, """
+            { "Settings": { "ShowDesktopLabel": true, "LabelCorner": "TopRight", "LabelOpacity": 0.5,
+                            "ShowSwitchBanner": false, "OverlayTextSize": "ExtraLarge" } }
+            """);
+        var loaded = new StateStore(path).Load();
+        Assert.False(loaded.Settings.ShowSwitchBanner);
+        Assert.Equal(OverlayTextSize.ExtraLarge, loaded.Settings.OverlayTextSize);
         File.Delete(path);
     }
 
@@ -130,7 +145,7 @@ public class StateStoreTests
     {
         var path = Path.Combine(Path.GetTempPath(), $"sk-{Guid.NewGuid()}.json");
         File.WriteAllText(path, "{ not json");
-        Assert.True(new StateStore(path).Load().Settings.ShowDesktopLabel);
+        Assert.True(new StateStore(path).Load().Settings.ShowSwitchBanner);
         File.Delete(path);
     }
 }

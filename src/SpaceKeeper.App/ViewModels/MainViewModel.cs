@@ -47,8 +47,6 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Raised when you change desktop: (new desktop, its display name).</summary>
     public event EventHandler<DesktopInfo>? SwitchedDesktop;
 
-    /// <summary>Raised when a setting affecting the overlays changes.</summary>
-    public event EventHandler? OverlaySettingsChanged;
 
     /// <summary>Raised when the shortcut setting changes (App.xaml.cs applies it).</summary>
     public event EventHandler? HotKeySettingChanged;
@@ -469,31 +467,11 @@ public sealed partial class MainViewModel : ObservableObject
         set { Settings.ShowSwitchBanner = value; SettingChanged(); }
     }
 
-    public bool ShowDesktopLabel
-    {
-        get => Settings.ShowDesktopLabel;
-        set { Settings.ShowDesktopLabel = value; SettingChanged(overlays: true); }
-    }
-
-    /// <summary>0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right.</summary>
-    public int LabelCornerIndex
-    {
-        get => (int)Settings.LabelCorner;
-        set { Settings.LabelCorner = (LabelCorner)Math.Clamp(value, 0, 3); SettingChanged(overlays: true); }
-    }
-
-    /// <summary>Opacity as a percentage (30–100) for the slider.</summary>
-    public double LabelOpacityPercent
-    {
-        get => Math.Round(Settings.LabelOpacity * 100);
-        set { Settings.LabelOpacity = Math.Clamp(value / 100, 0.3, 1); SettingChanged(overlays: true); }
-    }
-
     /// <summary>0 = standard, 1 = large, 2 = extra large.</summary>
     public int TextSizeIndex
     {
         get => (int)Settings.OverlayTextSize;
-        set { Settings.OverlayTextSize = (OverlayTextSize)Math.Clamp(value, 0, 2); SettingChanged(overlays: true); }
+        set { Settings.OverlayTextSize = (OverlayTextSize)Math.Clamp(value, 0, 2); SettingChanged(); }
     }
 
     public bool OpenWithHotKey
@@ -535,11 +513,10 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private void SettingChanged(bool overlays = false, [System.Runtime.CompilerServices.CallerMemberName] string? property = null)
+    private void SettingChanged([System.Runtime.CompilerServices.CallerMemberName] string? property = null)
     {
         Save();
         OnPropertyChanged(property);
-        if (overlays) OverlaySettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void Save() => _store.Save(_state);

@@ -1,17 +1,18 @@
 // ======================================================================
-// OverlayWindow.xaml.cs — the corner label and the switch banner
+// OverlayWindow.xaml.cs — the switch banner
 // ======================================================================
-// Both are tiny always-on-top windows that:
-//   • let mouse clicks pass straight through to whatever is underneath,
-//   • never take keyboard focus,
-//   • don't appear in Alt+Tab or the taskbar,
-//   • appear on EVERY virtual desktop (so the label is always visible).
+// A tiny always-on-top window that shows the desktop's name in the lower
+// middle of the screen for a moment after you switch desktop, then hides
+// itself. While it's showing it:
+//   • lets mouse clicks pass straight through to whatever is underneath,
+//   • never takes keyboard focus,
+//   • doesn't appear in Alt+Tab or the taskbar,
+//   • appears on EVERY virtual desktop.
 //
-// The LABEL shows the current desktop's name in a chosen corner.
-// The BANNER shows the name in the lower middle of the screen for a moment
-// after you switch desktop.
+// (Earlier versions also kept a permanent name label in a corner of the
+// screen; it was removed because it could cover controls in other apps.)
 //
-// Created by App.xaml.cs, which calls ShowLabel / ShowBanner / HideOverlay.
+// Created by App.xaml.cs, which calls ShowBanner.
 // Accessibility: hidden from screen readers (the panel announces the same
 // information); text grows with Settings › Accessibility › Text size;
 // solid background (no transparency); no animation.
@@ -48,23 +49,7 @@ public sealed partial class OverlayWindow : Window
         _hideTimer.Tick += (_, _) => HideOverlay();
     }
 
-    public static OverlayWindow CreateLabel(VirtualDesktopService desktops) => new(desktops);
     public static OverlayWindow CreateBanner(VirtualDesktopService desktops) => new(desktops);
-
-    /// <summary>Shows the desktop name in a corner of the main screen.</summary>
-    public void ShowLabel(string name, double points, LabelCorner corner, double opacity)
-    {
-        SetText(name, null, points);
-        WindowHelpers.MakeClickThrough(this, opacity);
-        var size = MeasureInPixels();
-        var area = DisplayArea.Primary.WorkArea;
-        var margin = (int)(12 * WindowHelpers.Scale(this));
-        var left = corner is LabelCorner.TopLeft or LabelCorner.BottomLeft;
-        var top = corner is LabelCorner.TopLeft or LabelCorner.TopRight;
-        var x = left ? area.X + margin : area.X + area.Width - size.Width - margin;
-        var y = top ? area.Y + margin : area.Y + area.Height - size.Height - margin;
-        ShowAt(new RectInt32(x, y, size.Width, size.Height));
-    }
 
     /// <summary>Shows the switch banner for a moment, centred low on the main screen.</summary>
     public void ShowBanner(string title, string? subtitle, double points)

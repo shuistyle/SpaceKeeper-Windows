@@ -13,7 +13,6 @@ A Windows 11 tray app to **name, pin, reorder, add and remove virtual desktops**
 | **Add / remove** | **Add desktop** (or Ctrl+N) adds a desktop. It's never greyed out, because Windows has no maximum number of desktops (macOS stops at 16). The **×** on a tile, then **Remove**, closes that desktop, and Windows moves its windows to a neighbouring desktop. |
 | **Pin the order** | Pin important desktops. If one is dragged out of order in Task View, the panel shows a warning saying where it belongs, with **Accept new order** and **Open Task View**. |
 | **Your own grid order** | Drag tiles, or use Alt+Shift+arrow keys or right-click › Move earlier/later, to keep related desktops together. Task View's order isn't changed. |
-| **Name label** | A small label in a corner of the screen always shows which desktop you're on. You choose the corner, opacity and size. |
 | **Switch banner** | The desktop's name appears briefly when you change desktop. |
 | **Open from anywhere** | **Double-tap Ctrl** (one hand) opens or closes the panel from any app; **Ctrl+Alt+S** works too. Esc closes it. |
 | **Bigger tiles** | Settings › Desktop tile size, the small/large **A** buttons, or Ctrl+Plus / Ctrl+Minus / Ctrl+0. |
@@ -100,7 +99,7 @@ Or open **SpaceKeeper.slnx** in Visual Studio, choose **x64**, and press F5.
 - **Vision:**
   - Follows light, dark and **contrast themes** automatically.
   - **Desktop tile size** (Standard, Large, Extra large, Largest — up to double size) makes tiles, names and buttons bigger. It works on top of Windows' **Settings › Accessibility › Text size**, and tiles grow with both so text is never cut off.
-  - The label and banner have their own Large and Extra large sizes.
+  - The switch banner has its own Large and Extra large sizes.
   - Nothing relies on colour alone: the pin icon changes shape, and the current desktop has a thick border, a ringed number and the word "current".
 - **Motion and transparency:**
   - The overlays never animate.
@@ -122,7 +121,7 @@ src/SpaceKeeper.App/             the Windows app (WinUI 3)
   ViewModels/MainViewModel.cs    the "brain": data and actions for the panel
   ViewModels/DesktopTileViewModel.cs one tile in the grid
   Views/PanelWindow.xaml(.cs)    the panel
-  Views/OverlayWindow.xaml(.cs)  corner label and switch banner
+  Views/OverlayWindow.xaml(.cs)  switch banner
   Services/VirtualDesktopService.cs  talks to Windows' virtual desktops
   Services/DoubleTapCtrlService.cs  double-tap Ctrl (one-handed shortcut)
   Services/HotKeyService.cs      Ctrl+Alt+S

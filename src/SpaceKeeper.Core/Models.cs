@@ -66,10 +66,7 @@ public sealed record PinAlert(Guid Id, string Name, PinProblem Problem, string? 
     };
 }
 
-/// <summary>Which screen corner the desktop name label sits in.</summary>
-public enum LabelCorner { TopLeft, TopRight, BottomLeft, BottomRight }
-
-/// <summary>Accessibility: text size for the on-screen label and switch banner.</summary>
+/// <summary>Accessibility: text size for the switch banner.</summary>
 public enum OverlayTextSize { Standard, Large, ExtraLarge }
 
 /// <summary>
@@ -109,13 +106,10 @@ public sealed class AppSettings
     /// <summary>Show a banner with the desktop's name when you switch.</summary>
     public bool ShowSwitchBanner { get; set; } = true;
 
-    /// <summary>Keep a small name label in a corner of the screen.</summary>
-    public bool ShowDesktopLabel { get; set; } = true;
-
-    public LabelCorner LabelCorner { get; set; } = LabelCorner.BottomLeft;
-
-    /// <summary>Label opacity from 0.3 (faint) to 1.0 (solid).</summary>
-    public double LabelOpacity { get; set; } = 0.9;
+    // (Earlier versions also kept the desktop's name in a corner of the
+    // screen. It was removed because it could cover controls in other apps
+    // and on web pages. Old settings files that still mention it load fine:
+    // unknown settings are ignored.)
 
     public OverlayTextSize OverlayTextSize { get; set; } = OverlayTextSize.Standard;
 
@@ -131,12 +125,12 @@ public sealed class AppSettings
     /// <summary>Also show a Windows notification when the pinned order changes.</summary>
     public bool NotifyPinMoves { get; set; } = false;
 
-    /// <summary>Point sizes for the overlays at each text size.</summary>
-    public (double Banner, double Label) OverlayPoints => OverlayTextSize switch
+    /// <summary>Point size of the switch banner's text at each text size.</summary>
+    public double BannerPoints => OverlayTextSize switch
     {
-        OverlayTextSize.Large => (40, 22),
-        OverlayTextSize.ExtraLarge => (52, 28),
-        _ => (30, 16),
+        OverlayTextSize.Large => 40,
+        OverlayTextSize.ExtraLarge => 52,
+        _ => 30,
     };
 }
 
