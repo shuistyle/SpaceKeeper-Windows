@@ -48,7 +48,7 @@
          updates as pull requests — see .github/dependabot.yml).
          Microsoft.Windows.SDK.BuildTools comes in automatically with the
          Windows App SDK, at the version that SDK asks for. -->
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.5" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="H.NotifyIcon.WinUI" Version="2.4.1" />
     <PackageReference Include="Slions.VirtualDesktop" Version="6.9.2" />
